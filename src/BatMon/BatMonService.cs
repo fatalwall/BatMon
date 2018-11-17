@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
-using BatMon.Framework;
+﻿/* 
+ *Copyright (C) 2018 Peter Varney - All Rights Reserved
+ * You may use, distribute and modify this code under the
+ * terms of the MIT license, 
+ *
+ * You should have received a copy of the MIT license with
+ * this file. If not, visit : https://github.com/fatalwall/BatMon
+ */
 
+using System.ServiceProcess;
 using Nancy.Hosting.Self;
 
 namespace BatMon
