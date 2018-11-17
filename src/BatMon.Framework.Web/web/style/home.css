@@ -1,0 +1,83 @@
+﻿.home {
+    visibility: visible;
+}
+
+.json {
+    visibility: hidden;
+}
+
+.appd {
+    visibility: hidden;
+}
+
+.Body {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.Widget {
+    border: 3px solid #1C6EA4;
+    border-radius: 15px;
+    margin: 4px;
+}
+
+    .Widget .header {
+        -moz-border-radius-topright: 10px;
+        -moz-border-radius-topleft: 10px;
+        -webkit-border-top-right-radius: 10px;
+        -webkit-border-top-left-radius: 10px;
+        background: #1C6EA4;
+        color: white;
+        padding: 4px;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .Widget .link {
+        color: #333;
+        padding: 6px;
+    }
+
+    .Widget .content {
+        color: #333;
+        padding: 2px;
+    }
+
+.WidgetWrapper {
+    flex: 0 1 auto;
+}
+
+.WidgetWrapperFill {
+    flex: 1 1 auto;
+}
+
+table.System {
+    width: 100%;
+    text-align: center;
+}
+
+table.DiskDrives {
+    width: 100%;
+    text-align: center;
+}
+
+tr.Warning {
+    color: #FDA50F;
+}
+
+tr.Critical {
+    color: #CC7722;
+}
+
+.PieChart {
+    flex: 0 1 auto;
+    width: 200px;
+    height: 200px;
+}
+
+.PieChartWrapper {
+    padding: 6px;
+    display: flex;
+    flex-wrap: wrap;
+}
