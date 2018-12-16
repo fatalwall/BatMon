@@ -17,6 +17,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.Web", "Bat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.AllPlugins", "BatMon.AllPlugins\BatMon.AllPlugins.csproj", "{C5BD6183-ACA8-4341-B603-1518664EA06E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Installer Package", "{0DB0153C-562B-4071-BBAE-9DFDE0D411C6}"
+	ProjectSection(SolutionItems) = preProject
+		BatMon Installer.nsi = BatMon Installer.nsi
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
