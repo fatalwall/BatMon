@@ -88,17 +88,7 @@ namespace BatMon.Framework.Web
                 pluginManager.RunAll();
                 foreach (var p in pluginManager.Plugins.Where(i => i.Value.Results.Values.Count > 0))
                 {
-                    t = t + string.Format(@"google.charts.setOnLoadCallback(drawChart{0});", p.Metadata.Name);
-                    t = t + string.Format("function drawChart{0}() {{ var data = google.visualization.arrayToDataTable([", p.Metadata.Name);
-                    t = t + string.Format("['{0}', '{1}']", "ErrorCode", "Counts");
-                         
-                    foreach (var g in p.Value.Results.Values.GroupBy(i => i.ErrorCode))
-                    {
-                        t = t + string.Format(",['{0}', {1}]",g.Key,g.Count());
-                    }
-                    t = t + string.Format(@"]); var options = {{ pieSliceText: 'label', 'legend':'none', 'width':'100%', 'height':'100%', title: '{0}', titleTextStyle: {{ 'fontSize':14, 'bold':true }}  }};", p.Metadata.Name);
-                    t = t + string.Format(@"var chart = new google.visualization.PieChart(document.getElementById('{0}'));", p.Metadata.Name);
-                    t = t + string.Format(@"chart.draw(data, options);}}", p.Metadata.Name);
+                    t = t + p.Value.htmlPieChart();
                 }
                 t = t + @"</script>";
                 t = t + "<div class='PieChartWrapper'>";

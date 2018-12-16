@@ -109,7 +109,7 @@ namespace BatMon
         {
             var result = new List<Result>();
             if (!(modules is null))
-            foreach (Lazy<IBatMonPlugin, IMetadata> com in Plugins)
+            foreach (Lazy<IBatMonPlugin, IMetadata> com in Plugins.Where(p => !p.Metadata.isAggregate))
             {
                 Console.WriteLine(com.Metadata.Name);
                 if (com.Value.Run())

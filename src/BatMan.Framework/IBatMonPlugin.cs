@@ -11,15 +11,21 @@ namespace BatMon.Framework
 {
     public interface IBatMonPlugin
     {           
-        MonitorResults Results { get; set; }
+        MonitorResults Results { get; }
         
         BatMonPluginAbout About { get; }
 
         bool Run();
+
+        string htmlPieChart();
+
+        string htmlWidget();
+
     }
 
     public interface IMetadata
     {
         string Name { get; }
+        bool isAggregate { get; }
     }
 }

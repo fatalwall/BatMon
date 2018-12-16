@@ -23,6 +23,7 @@ namespace BatMon.ScheduledTasks
 {
     [Export(typeof(IBatMonPlugin))]
     [ExportMetadata("Name", "ScheduledTasks")]
+    [ExportMetadata("isAggregate", false)]
     public class ScheduledTasksPlugin : BatMonPlugin, IBatMonPlugin
     {
         private string DetermineApplication(Task task, ScheduledTasksSection settings)
@@ -83,7 +84,7 @@ namespace BatMon.ScheduledTasks
             return r.ToArray();
         }
 
-        protected override Result[] getResults()
+        protected override Result[] fetchResults()
         {
             //create a fallback if no section exists in the app.config so that it will look for a ScheduledTasks.config
             var settings = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection ?? ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection;

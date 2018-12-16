@@ -17,7 +17,7 @@ namespace BatMon.WindowsShare
     public class WindowsSharePlugin : BatMonPlugin, IBatMonPlugin
     {
 
-        protected override Result[] getResults()
+        protected override Result[] fetchResults()
         {
             return null;
         }
