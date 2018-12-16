@@ -71,7 +71,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BatMan.Framework\BatMon.Framework.csproj">
+    <ProjectReference Include="..\BatMon.Framework\BatMon.Framework.csproj">
       <Project>{1ac1cb3a-98d0-499b-8aef-7043c78a4dc6}</Project>
       <Name>BatMon.Framework</Name>
     </ProjectReference>
