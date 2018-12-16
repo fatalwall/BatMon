@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.ScheduledTasks", "BatMan.TaskSchedule\BatMon.ScheduledTasks.csproj", "{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.ScheduledTasks", "BatMon.TaskSchedule\BatMon.ScheduledTasks.csproj", "{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework", "BatMan.Framework\BatMon.Framework.csproj", "{1AC1CB3A-98D0-499B-8AEF-7043C78A4DC6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework", "BatMon.Framework\BatMon.Framework.csproj", "{1AC1CB3A-98D0-499B-8AEF-7043C78A4DC6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.WindowsShare", "BatMan.WindowsShare\BatMon.WindowsShare.csproj", "{948121BA-9E79-4B6C-B215-67FABD36BB84}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.WindowsShare", "BatMon.WindowsShare\BatMon.WindowsShare.csproj", "{948121BA-9E79-4B6C-B215-67FABD36BB84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.TestHarness", "BatMon.Framework.TestHarness\BatMon.Framework.TestHarness.csproj", "{515DE1B6-92E0-4BA0-BE60-F874474F8C12}"
 EndProject
