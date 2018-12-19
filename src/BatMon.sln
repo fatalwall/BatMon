@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.ScheduledTasks", "BatMon.TaskSchedule\BatMon.ScheduledTasks.csproj", "{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.ScheduledTasks", "BatMon.ScheduledTasks\BatMon.ScheduledTasks.csproj", "{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework", "BatMon.Framework\BatMon.Framework.csproj", "{1AC1CB3A-98D0-499B-8AEF-7043C78A4DC6}"
 EndProject
@@ -19,7 +19,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.AllPlugins", "BatMon
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Installer Package", "{0DB0153C-562B-4071-BBAE-9DFDE0D411C6}"
 	ProjectSection(SolutionItems) = preProject
-		BatMon Installer.nsi = BatMon Installer.nsi
+		Installer Package\BatMon Installer.nsi = Installer Package\BatMon Installer.nsi
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default Config", "Default Config", "{39B39A86-FCBB-4CE9-B25B-0DF970689906}"
+	ProjectSection(SolutionItems) = preProject
+		Installer Package\Default Config\BatMon.ScheduledTasks.dll.config = Installer Package\Default Config\BatMon.ScheduledTasks.dll.config
 	EndProjectSection
 EndProject
 Global
@@ -59,6 +64,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{39B39A86-FCBB-4CE9-B25B-0DF970689906} = {0DB0153C-562B-4071-BBAE-9DFDE0D411C6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {938C7C97-E7DA-465A-B903-846CC9D2DC52}
