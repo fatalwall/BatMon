@@ -113,7 +113,7 @@ namespace BatMon.ScheduledTasks
                             if (t.LastRunTime == DateTime.MinValue)
                             {
                                 //Task has never run
-                                r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes["NeverRun"].AppDynamicsCode, settings.ResultCodes["NeverRun"].Description + " - Next Run Time: " + (t.NextRunTime == DateTime.MinValue ? "" : t.NextRunTime.ToString())));
+                                r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes["NeverRun"].AppDynamicsCode, settings.ResultCodes["NeverRun"].Description,t));
                                 logger.Info(string.Format("Application: {0,-40}Tier: {1,-40}ProcessName: {2,-40}Exit Code: {3,-15}Error Code: {4,-20}Error Description: {5}"
                                                             , Application
                                                             , Tier
@@ -127,7 +127,7 @@ namespace BatMon.ScheduledTasks
                             else
                             {
                                 //Base code off of the exit code
-                                r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes[t.LastTaskResult.ToString()].AppDynamicsCode, settings.ResultCodes[t.LastTaskResult.ToString()].Description + " - Next Run Time: " + (t.NextRunTime == DateTime.MinValue ? "" : t.NextRunTime.ToString())));
+                                r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes[t.LastTaskResult.ToString()].AppDynamicsCode, settings.ResultCodes[t.LastTaskResult.ToString()].Description, t));
                                 if (settings.ResultCodes[t.LastTaskResult.ToString()] == settings.ResultCodes.Default)
                                 {
                                     logger.Warn(string.Format("Application: {0,-40}Tier: {1,-40}ProcessName: {2,-40}Exit Code: {3,-15}Error Code: {4,-20}Error Description: {5}"
@@ -157,7 +157,7 @@ namespace BatMon.ScheduledTasks
                         else
                         {
                             //Job is disabled
-                            r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes["Disabled"].AppDynamicsCode, settings.ResultCodes["Disabled"].Description));
+                            r.Add(new Result(Application, Tier, t.Name, settings.ResultCodes["Disabled"].AppDynamicsCode, settings.ResultCodes["Disabled"].Description,t));
                             logger.Info(string.Format("Application: {0,-40}Tier: {1,-40}ProcessName: {2,-40}Exit Code: {3,-15}Error Code: {4,-20}Error Description: {5}"
                                                             , Application
                                                             , Tier

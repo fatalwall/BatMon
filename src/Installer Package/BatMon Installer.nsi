@@ -9,7 +9,9 @@
 
 ;Required modules
 !include MUI.nsh
-!include DotNetVersion.nsh
+!include "strExplode.nsh"
+!include "DotNetVersion.nsh"
+
 
 ;Definitions
 !define PRODUCT_NAME "&{BatMon.AssemblyTitle}"
@@ -22,11 +24,11 @@
 !define MUI_ABORTWARNING
 !define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
-!define MUI_DIRECTORYPAGE_VARIABLE $PluginsFolder
+!define MUI_DIRECTORYPAGE_VARIABLE $INSTDIR
 
 ;MUI Installer Pages
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE ""
+!insertmacro MUI_PAGE_LICENSE "LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
@@ -51,6 +53,11 @@ ShowUnInstDetails show
 ## Install
 ############################
 	Section "BatMon Core Files (Required)" core
+		SectionIn RO
+		;Write Service Files
+
+		;Create Service
+
 		SetShellVarContext all
 		CreateShortCut '$desktop\${PRODUCT_NAME} Dashboard.lnk' 'http://localhost:7865' '' "$INSTDIR\BatMon.exe" 2 SW_SHOWMAXIMIZED
 	SectionEND
@@ -59,18 +66,18 @@ ShowUnInstDetails show
 		Section "All Plugins" plgnAllPlugins
 			SetOverwrite on
 			CreateDirectory "$INSTDIR\Plugins"
-			File "/oname=$INSTDIR\Plugins\BatMon.AllPlugins.dll" "..\BatMon.AllPlugins\bin\Release\BatMon.AllPlugins.dll"
+			File "/oname=$INSTDIR\Plugins\BatMon.AllPlugins.dll" "..\..\..\BatMon.AllPlugins\bin\Release\BatMon.AllPlugins.dll"
 			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "AllPlugins" "&{BatMon.AllPlugins.AssemblyVersion}"	
 		SectionEnd
 		Section "Scheduled Tasks" plgnScheduledTasks
 			SetOverwrite on
 			CreateDirectory "$INSTDIR\Plugins"
 			CreateDirectory "$INSTDIR\Plugins\BatMon.ScheduledTasks"
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll" "..\BatMon.ScheduledTasks\bin\Release\BatMon.ScheduledTasks.dll"
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\Microsoft.Win32.TaskScheduler.dll" "..\BatMon.ScheduledTasks\bin\Release\Microsoft.Win32.TaskScheduler.dll"
+			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll" "..\..\..\BatMon.ScheduledTasks\bin\Release\BatMon.ScheduledTasks.dll"
+			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\Microsoft.Win32.TaskScheduler.dll" "..\..\..\BatMon.ScheduledTasks\bin\Release\Microsoft.Win32.TaskScheduler.dll"
 			SetOverwrite off ;Do not overwrite Config files
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll.config" "Default Config\BatMon.ScheduledTasks.dll.config"
-			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "ScheduledTasks" "&{BatMon.WindowsShare.AssemblyVersion}"
+			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll.config" "..\..\Default Config\BatMon.ScheduledTasks.dll.config"
+			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "ScheduledTasks" "&{BatMon.ScheduledTasks.AssemblyVersion}"
 		SectionEnd
 	SectionGroupEnd
 
@@ -81,9 +88,17 @@ ShowUnInstDetails show
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_NAME}.exe"
+
+		;Start Service
+
 	SectionEnd
 
 	Function .onInit
+
+		;Check if upgrade or repair and adjust selected sections accordingly
+
+		;have silent install support upgradeing/repairing existing components & installing new
+
 	FunctionEnd
 
 ############################

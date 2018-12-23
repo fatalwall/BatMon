@@ -8,11 +8,12 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>BatMon</RootNamespace>
     <AssemblyName>BatMon</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -38,6 +39,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>BatMon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Nancy, Version=1.4.5.0, Culture=neutral, processorArchitecture=MSIL">
@@ -81,7 +85,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BatMon.ico" />
+    <Content Include="BatMon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent.ps1" "$(SolutionDir)\" $(ConfigurationName)
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>
