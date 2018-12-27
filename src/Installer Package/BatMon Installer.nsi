@@ -55,8 +55,30 @@ ShowUnInstDetails show
 	Section "BatMon Core Files (Required)" core
 		SectionIn RO
 		;Write Service Files
+		File "/oname=$INSTDIR\BatMon.exe" "..\..\..\BatMon\bin\Release\BatMon.exe"
+		File "/oname=$INSTDIR\BatMon.Framework.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.dll"
+		File "/oname=$INSTDIR\BatMon.Framework.Web.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.Web.dll"
+		File "/oname=$INSTDIR\Nancy.dll" "..\..\..\BatMon\bin\Release\Nancy.dll"
+		File "/oname=$INSTDIR\Nancy.Hosting.Self.dll" "..\..\..\BatMon\bin\Release\Nancy.Hosting.Self.dll"
+		File "/oname=$INSTDIR\Newtonsoft.Json.dll" "..\..\..\BatMon\bin\Release\Newtonsoft.Json.dll"
+		File "/oname=$INSTDIR\NLog.dll" "..\..\..\BatMon\bin\Release\NLog.dll"
+		SetOverwrite off ;Do not overwrite Config files
+		File "/oname=$INSTDIR\BatMon.exe.config" "..\..\Default Config\BatMon.exe.config"
+		SetOverwrite on ;Allow Over files
 
 		;Create Service
+		SimpleSC::InstallService "$(^Name)" "BatMon (System Monitor)" "16" "2" "$INSTDIR\BatMon.exe" "" "" ""
+		Pop $0
+		IntCmp $0 0 +3
+		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not create service." /SD IDOK
+		Abort
+		
+		;Start Service
+		SimpleSC::StartService "$(^Name)" "" 30
+		Pop $0
+		IntCmp $0 0 +3
+		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not start service." /SD IDOK
+		Abort
 
 		SetShellVarContext all
 		CreateShortCut '$desktop\${PRODUCT_NAME} Dashboard.lnk' 'http://localhost:7865' '' "$INSTDIR\BatMon.exe" 2 SW_SHOWMAXIMIZED
@@ -77,6 +99,7 @@ ShowUnInstDetails show
 			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\Microsoft.Win32.TaskScheduler.dll" "..\..\..\BatMon.ScheduledTasks\bin\Release\Microsoft.Win32.TaskScheduler.dll"
 			SetOverwrite off ;Do not overwrite Config files
 			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll.config" "..\..\Default Config\BatMon.ScheduledTasks.dll.config"
+			SetOverwrite on ;Allow Over files
 			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "ScheduledTasks" "&{BatMon.ScheduledTasks.AssemblyVersion}"
 		SectionEnd
 	SectionGroupEnd
@@ -122,9 +145,23 @@ ShowUnInstDetails show
 		############################
 		## Unique Cleanup Tasks
 		############################
+		;Service
+		SimpleSC::ExistsService "$(^Name)"
+		Pop $0
+		IntCmp $0 0 +1 SkipService
 		;Stop Service
-
+		SimpleSC::StopService "$(^Name)" 1 30
+		Pop $0
+		IntCmp $0 0 +3
+		MessageBox MB_OK|MB_ICONSTOP "$(^Name) uninstall failed: could not stop service." /SD IDOK
+		Abort
 		;Delete Service
+		SimpleSC::RemoveService "$(^Name)"
+		Pop $0
+		IntCmp $0 0 +3
+		MessageBox MB_OK|MB_ICONSTOP "$(^Name) uninstall failed: could not remove service." /SD IDOK
+		Abort
+		SkipService:
 
 		;Delete Files
 

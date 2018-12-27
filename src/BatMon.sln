@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Instal
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default Config", "Default Config", "{39B39A86-FCBB-4CE9-B25B-0DF970689906}"
 	ProjectSection(SolutionItems) = preProject
+		Installer Package\Default Config\BatMon.exe.config = Installer Package\Default Config\BatMon.exe.config
 		Installer Package\Default Config\BatMon.ScheduledTasks.dll.config = Installer Package\Default Config\BatMon.ScheduledTasks.dll.config
 	EndProjectSection
 EndProject
