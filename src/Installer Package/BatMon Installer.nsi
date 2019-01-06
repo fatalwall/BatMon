@@ -8,9 +8,10 @@
 ####################################################################
 
 ;Required modules
-!include MUI.nsh
+!include MUI2.nsh
 !include "strExplode.nsh"
 !include "DotNetVersion.nsh"
+!include "LogicLib.nsh"
 
 
 ;Definitions
@@ -30,7 +31,7 @@
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE "LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_COMPONENTS
+Page Custom PluginsShow PluginsLeave
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -40,7 +41,6 @@
 ;MUI Language Files
 !insertmacro MUI_LANGUAGE "English"
 
-
 ;Settings
 Name "${PRODUCT_NAME}"
 OutFile "${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
@@ -48,6 +48,16 @@ RequestExecutionLevel admin
 InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 ShowInstDetails show
 ShowUnInstDetails show
+
+Var PluginCounter
+Var PluginVersion
+Var PluginCurVersion
+Var PluginChecked
+Var PluginName
+Var PluginUninstaller
+
+ReserveFile `Plugins.ini`
+
 
 ############################
 ## Install
@@ -72,37 +82,51 @@ ShowUnInstDetails show
 		IntCmp $0 0 +3
 		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not create service." /SD IDOK
 		Abort
-		
-		;Start Service
-		SimpleSC::StartService "$(^Name)" "" 30
-		Pop $0
-		IntCmp $0 0 +3
-		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not start service." /SD IDOK
-		Abort
+		DetailPrint "BatMon Service Installed"
 
 		SetShellVarContext all
 		CreateShortCut '$desktop\${PRODUCT_NAME} Dashboard.lnk' 'http://localhost:7865' '' "$INSTDIR\BatMon.exe" 2 SW_SHOWMAXIMIZED
-	SectionEND
+		DetailPrint "Desktop shortcut to Dashboard created"
+	SectionEnd
 
-	SectionGroup "Plugins" plgn
-		Section "All Plugins" plgnAllPlugins
-			SetOverwrite on
-			CreateDirectory "$INSTDIR\Plugins"
-			File "/oname=$INSTDIR\Plugins\BatMon.AllPlugins.dll" "..\..\..\BatMon.AllPlugins\bin\Release\BatMon.AllPlugins.dll"
-			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "AllPlugins" "&{BatMon.AllPlugins.AssemblyVersion}"	
-		SectionEnd
-		Section "Scheduled Tasks" plgnScheduledTasks
-			SetOverwrite on
-			CreateDirectory "$INSTDIR\Plugins"
-			CreateDirectory "$INSTDIR\Plugins\BatMon.ScheduledTasks"
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll" "..\..\..\BatMon.ScheduledTasks\bin\Release\BatMon.ScheduledTasks.dll"
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\Microsoft.Win32.TaskScheduler.dll" "..\..\..\BatMon.ScheduledTasks\bin\Release\Microsoft.Win32.TaskScheduler.dll"
-			SetOverwrite off ;Do not overwrite Config files
-			File "/oname=$INSTDIR\Plugins\BatMon.ScheduledTasks\BatMon.ScheduledTasks.dll.config" "..\..\Default Config\BatMon.ScheduledTasks.dll.config"
-			SetOverwrite on ;Allow Over files
-			WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}\Plugins" "ScheduledTasks" "&{BatMon.ScheduledTasks.AssemblyVersion}"
-		SectionEnd
-	SectionGroupEnd
+	Section "Plugins" plgn
+		SectionIn RO
+		;This function loops through all plugin list items and installs, uninstalls, or skips based on whats needed
+		File /r "Plugins\*"
+		StrCpy $PluginCounter 0
+		${Do}
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			ReadINIStr $PluginVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem1`
+			ReadINIStr $PluginCurVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem2`
+			ReadINIStr $PluginChecked `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked`
+
+			${If} $PluginChecked = 1
+				;Run Plugin Installer
+				ExecWait `"$EXEDIR\$PluginName $PluginVersion.exe" /S /D=$INSTDIR\Plugins` $0
+				${If} $0 = 0
+					DetailPrint "$PluginName Successfully Installed"
+				${Else}
+					DetailPrint "$PluginName Failed to Install with Exit Code $0"
+				${EndIf}
+			${Else}
+				${IfNot} $PluginCurVersion == ``
+					;Uninstall the plugin
+					ReadRegStr $PluginUninstaller HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "UninstallString"
+					ExecWait `"$PluginUninstaller" /S` $0
+					${If} $0 = 0
+						DetailPrint "$PluginName Successfully Uninstalled"
+					${Else}
+						DetailPrint "$PluginName Failed to Uninstall with Exit Code $0"
+					${EndIf}
+				${EndIf}
+			${EndIf}
+		${Loop}
+	SectionEnd
 
 	Section -Post
 		WriteUninstaller "$INSTDIR\uninst.exe"
@@ -113,15 +137,66 @@ ShowUnInstDetails show
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_NAME}.exe"
 
 		;Start Service
-
+		SimpleSC::StartService "$(^Name)" "" 30
+		Pop $0
+		IntCmp $0 0 +3
+		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not start service." /SD IDOK
+		Abort
+		DetailPrint "BatMon Service started successfully"
 	SectionEnd
 
 	Function .onInit
+		InitPluginsDir
+		File `/oname=$PLUGINSDIR\Plugins.ini` `Plugins.ini`
+	FunctionEnd
 
-		;Check if upgrade or repair and adjust selected sections accordingly
+############################
+## Page Custom Plugins
+############################
+	Function PluginsShow
+		!insertmacro MUI_HEADER_TEXT "Available Plugins"  "Select plugins to install."
+		StrCpy $PluginCounter 0
+		;Identify plugins already installed
+		${Do} 
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
 
-		;have silent install support upgradeing/repairing existing components & installing new
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+		
+			ReadRegStr $PluginCurVersion HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "Version"
+			${IfNot} $PluginCurVersion == ``
+				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem2` `$PluginCurVersion`
+				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1` 
+			${EndIf}
+		${Loop}
+		;Populate plugin list
+		EmbeddedLists::Dialog `$PLUGINSDIR\Plugins.ini`
+		Pop $R0
+	FunctionEnd
 
+	Function PluginsLeave
+		;Clear Ini Check Value
+		StrCpy $PluginCounter 0
+		${Do}
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `0` 
+		${lOOP}
+
+		;Set Ini Check Value for selected
+		${Do} 
+			Pop $R0
+			${If} $R0 == /END
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1` 
+		${Loop}
 	FunctionEnd
 
 ############################
@@ -163,7 +238,40 @@ ShowUnInstDetails show
 		Abort
 		SkipService:
 
-		;Delete Files
+		;Uninstall All Plugins I know of 
+		StrCpy $PluginCounter 0
+		${Do}
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			ReadRegStr $PluginUninstaller HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "UninstallString"
+			ExecWait `"$PluginUninstaller" /S` $0
+			${If} $0 = 0
+				DetailPrint "$PluginName Successfully Uninstalled"
+			${Else}
+				DetailPrint "$PluginName Failed to Uninstall with Exit Code $0"
+			${EndIf}
+		${lOOP}
+		;Uninstall Any Plugins I do not know of
+		FindFirst $0 $1 "$INSTDIR\Plugins\*.*"
+		loop:
+		StrCmp $1 "" done
+		${If} ${FileExists} "$INSTDIR\Plugins\$1\*.exe"
+			DetailPrint "Subdir found: $INSTDIR\$1"
+			ExecWait `"$INSTDIR\Plugins\$1\uninst.exe" /S` $0
+			${If} $0 = 0
+				DetailPrint "$PluginName Successfully Uninstalled"
+			${Else}
+				DetailPrint "$PluginName Failed to Uninstall with Exit Code $0"
+			${EndIf}
+		${EndIf}
+		FindNext $0 $1
+		Goto loop
+		done:
+		FindClose $0
 
 		;Delete Desktop Shortcut
 		SetShellVarContext all
@@ -175,20 +283,9 @@ ShowUnInstDetails show
 		;Delete the the uninstaller
 		Delete "$INSTDIR\uninst.exe"
 		;Delete installation folder if empty
-		RMDir "$INSTDIR"
+		RMDir /r /REBOOTOK "$INSTDIR"
 		;Delete Add/Remove Programs registry keys
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		
 		SetAutoClose true
 	SectionEnd
-
-
-############################
-## Descriptions of Sections
-############################
-!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${core} "Windows Service"
-  !insertmacro MUI_DESCRIPTION_TEXT ${plgn} "Official plugins"
-  !insertmacro MUI_DESCRIPTION_TEXT ${plgnAllPlugins} "Aggregate of all other plugin results. Allows for a single URI to pull all results from"
-  !insertmacro MUI_DESCRIPTION_TEXT ${plgnScheduledTasks} "Provides code for the last run attenpts of scheudled tasks"
-!insertmacro MUI_FUNCTION_DESCRIPTION_END
