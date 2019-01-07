@@ -329,3 +329,5 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
 /src/BatMon.Framework.TestHarness
+/src/Installer Package/Dependencies/.Net 4.7 Framework/NDP47-KB3186500-Web.exe
+/src/Installer Package/Dependencies/.Net 4.7 Framework/NDP47-KB3186497-x86-x64-AllOS-ENU.exe

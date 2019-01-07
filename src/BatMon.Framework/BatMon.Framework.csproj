@@ -88,5 +88,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="dummy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>Echo Clearing $(ConfigurationName) Plugins output directory
+rmdir /s /q "$(SolutionDir)Installer Package\$(OutDir)Plugins"
+mkdir  "$(SolutionDir)Installer Package\$(OutDir)Plugins"
+
+Echo Copying Plugins.ini to $(ConfigurationName) output directory
+Copy "$(SolutionDir)Installer Package\Plugins.ini" "$(SolutionDir)Installer Package\$(OutDir)Plugins.ini"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

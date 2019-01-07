@@ -76,5 +76,14 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="dummy.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

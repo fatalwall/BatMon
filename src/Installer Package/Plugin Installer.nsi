@@ -40,9 +40,9 @@
 
 ;Settings
 Name "${PRODUCT_NAME}"
-OutFile "${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
+OutFile "Plugins\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
 RequestExecutionLevel admin
-InstallDir "$PROGRAMFILES\BatMon\Plugins\${PRODUCT_NAME}"
+InstallDir "$PROGRAMFILES\BatMon\Plugins\&{Plugin.AssemblyName}"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -54,13 +54,14 @@ ShowUnInstDetails show
 
         CreateDirectory "$INSTDIR"
 		;Write Service Files
-        File "/oname=$INSTDIR\&{Plugin.AssemblyName}.dll" "..\..\..\&{Plugin.AssemblyName}\bin\Release\&{Plugin.AssemblyName}.dll"
+        ;File "/oname=$INSTDIR\&{Plugin.AssemblyName}.dll" "..\..\..\&{Plugin.AssemblyName}\bin\&{Plugin.BuildType}\&{Plugin.AssemblyName}.dll"
+		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "BatMon.Framework.dll" /x "Newtonsoft.Json.dll" /x "NLog.dll" "..\..\..\&{Plugin.AssemblyName}\bin\&{Plugin.BuildType}\*"
 
 		SetOverwrite off ;Do not overwrite Config files
-        IfFileExists "..\..\Default Config\&{Plugin.AssemblyName}.dll.config" 0 file_not_found
-    	File "/oname=$INSTDIR\&{Plugin.AssemblyName}.dll.config" "..\..\Default Config\&{Plugin.AssemblyName}.dll.config"
-        file_not_found:
-		SetOverwrite on ;Allow Over files
+		!if /FileExists "..\..\Default Config\&{Plugin.AssemblyName}.dll.config"
+			File "/oname=$INSTDIR\&{Plugin.AssemblyName}.dll.config" "..\..\Default Config\&{Plugin.AssemblyName}.dll.config"
+		!endif
+    	setOverwrite on ;Allow Over files
 	SectionEnd
 
     Section -Post

@@ -12,15 +12,17 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.TestHarness", "BatMon.Framework.TestHarness\BatMon.Framework.TestHarness.csproj", "{515DE1B6-92E0-4BA0-BE60-F874474F8C12}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon", "BatMon\BatMon.csproj", "{C68A0E97-28F2-4368-B2D2-D259727A5E23}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA} = {D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}
+		{C5BD6183-ACA8-4341-B603-1518664EA06E} = {C5BD6183-ACA8-4341-B603-1518664EA06E}
+		{948121BA-9E79-4B6C-B215-67FABD36BB84} = {948121BA-9E79-4B6C-B215-67FABD36BB84}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.Web", "BatMon.Framework.Web\BatMon.Framework.Web.csproj", "{DCAD985A-F79F-430E-85E8-456013AEDB53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.AllPlugins", "BatMon.AllPlugins\BatMon.AllPlugins.csproj", "{C5BD6183-ACA8-4341-B603-1518664EA06E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Installer Package", "{0DB0153C-562B-4071-BBAE-9DFDE0D411C6}"
-	ProjectSection(SolutionItems) = preProject
-		Installer Package\BatMon Installer.nsi = Installer Package\BatMon Installer.nsi
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default Config", "Default Config", "{39B39A86-FCBB-4CE9-B25B-0DF970689906}"
 	ProjectSection(SolutionItems) = preProject

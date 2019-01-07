@@ -13,10 +13,6 @@ set-location "$working"
 #	Copy NSIS Script into directory matching VS Build option
 #>
 copy "$source"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
-#strExplode.nsh
-copy "..\..\..\NSIS_strExplode\strExplode.nsh"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
-#DotNetVersion.nsh
-copy "..\..\..\NSIS_DotNetVersion\DotNetVersion.nsh"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
 #Licence File
 copy "..\..\LICENSE"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
 
@@ -31,12 +27,12 @@ $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 (gc "$workingFile") -replace '&{BatMon.AssemblyVersion}', "$output" | Out-File "$workingFile"
 
 # BatMan.exe CompanyName
-$args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' CompanyName';
+$args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Company';
 $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 (gc "$workingFile") -replace '&{BatMon.AssemblyCompany}', "$output" | Out-File "$workingFile"
 
 # BatMan.exe ProductName
-$args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' ProductName';
+$args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Product';
 $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 if ($ConfigurationName -eq 'Release') {
 	(gc "$workingFile") -replace '&{BatMon.AssemblyTitle}', "$output" | Out-File "$workingFile"
@@ -63,4 +59,6 @@ $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 #	Compile NSIS Script
 #>
 $output = cmd /c "`"C:\Program Files (x86)\NSIS\makensis.exe`" `"$workingFile`"" 2`>`&1
+if ($output -like '*Total size:*bytes*')
+{ $output = 'NSIS script successfully compiled for BatMon' }
 Write $output

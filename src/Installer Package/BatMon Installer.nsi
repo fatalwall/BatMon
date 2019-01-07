@@ -62,8 +62,25 @@ ReserveFile `Plugins.ini`
 ############################
 ## Install
 ############################
+	Section "!.Net 4.7" Net4
+		SectionIn RO
+		SetOverwrite on
+
+		${DotNetVersion} $0 '4' '7' '*'
+		${If} $0 == "FALSE"
+			File "/oname=$EXEDIR\.Net 4.7 Framework\NDP47-KB3186500-Web.exe" "..\..\Dependencies\.Net 4.7 Framework\NDP47-KB3186500-Web.exe"
+			DetailPrint "Installing .Net Framework 4.7 (Installation will take several minutes)"
+			nsExec::Exec '"$EXEDIR\.Net 4.7 Framework\NDP47-KB3186500-Web.exe" /q /norestart'
+		${Else}
+			DetailPrint ".Net Framework 4.7 or greater already installed"
+		${EndIf}
+	SectionEnd
+
 	Section "BatMon Core Files (Required)" core
 		SectionIn RO
+		;Check if Upgrade/Repair
+		;FIXME
+
 		;Write Service Files
 		File "/oname=$INSTDIR\BatMon.exe" "..\..\..\BatMon\bin\Release\BatMon.exe"
 		File "/oname=$INSTDIR\BatMon.Framework.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.dll"
@@ -91,7 +108,12 @@ ReserveFile `Plugins.ini`
 
 	Section "Plugins" plgn
 		SectionIn RO
+		;Silent option setting
+		IfSilent 0 plgn_Process
+			;FIXME
+		plgn_Process:
 		;This function loops through all plugin list items and installs, uninstalls, or skips based on whats needed
+		SetOutPath "$EXEDIR\Plugins"
 		File /r "Plugins\*"
 		StrCpy $PluginCounter 0
 		${Do}
