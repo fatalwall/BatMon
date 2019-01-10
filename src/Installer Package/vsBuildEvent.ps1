@@ -23,6 +23,15 @@ copy "..\..\LICENSE"  -Destination (New-Item "$workingDir" -Type container -forc
 #>
 # BatMan.exe Version
 $args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Version';
+$Version = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
+if ($ConfigurationName -eq 'Release') {
+    if($Version -match '\d*.\d*.\d*') { $Version = $matches[0] }
+    (gc "$workingFile") -replace '&{BatMon.AssemblyVersion}', "$Version" | Out-File "$workingFile"
+}else{
+    (gc "$workingFile") -replace '&{BatMon.AssemblyVersion}', "$Version" | Out-File "$workingFile"
+}
+
+$args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Version';
 $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 (gc "$workingFile") -replace '&{BatMon.AssemblyVersion}', "$output" | Out-File "$workingFile"
 
@@ -34,11 +43,8 @@ $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 # BatMan.exe ProductName
 $args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Product';
 $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
-if ($ConfigurationName -eq 'Release') {
-	(gc "$workingFile") -replace '&{BatMon.AssemblyTitle}', "$output" | Out-File "$workingFile"
-}else{
-	(gc "$workingFile") -replace '&{BatMon.AssemblyTitle}', "$output (Pre Release)" | Out-File "$workingFile"
-}
+(gc "$workingFile") -replace '&{BatMon.AssemblyTitle}', "$output" | Out-File "$workingFile"
+
 
 <#
 #	Insert Assembly Varables
