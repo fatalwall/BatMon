@@ -8,8 +8,10 @@
 ####################################################################
 
 ;Required modules
-!include MUI.nsh
+!include "MUI.nsh"
 !include "LogicLib.nsh"
+!include "x64.nsh"
+
 
 
 ;Definitions
@@ -42,7 +44,7 @@
 Name "${PRODUCT_NAME}"
 OutFile "Plugins\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
 RequestExecutionLevel admin
-InstallDir "$PROGRAMFILES\BatMon\Plugins\&{Plugin.AssemblyName}"
+InstallDir "$PROGRAMFILES\BatMon\Plugins"
 ShowInstDetails show
 ShowUnInstDetails show
 
@@ -51,10 +53,10 @@ ShowUnInstDetails show
 ############################
 	Section "Plugins" plgn
 		SectionIn RO
-
-        CreateDirectory "$INSTDIR"
+		
+		CreateDirectory "$INSTDIR"
+		SetOutPath "$INSTDIR"
 		;Write Service Files
-        ;File "/oname=$INSTDIR\&{Plugin.AssemblyName}.dll" "..\..\..\&{Plugin.AssemblyName}\bin\&{Plugin.BuildType}\&{Plugin.AssemblyName}.dll"
 		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "BatMon.Framework.dll" /x "Newtonsoft.Json.dll" /x "NLog.dll" "..\..\..\&{Plugin.AssemblyName}\bin\&{Plugin.BuildType}\*"
 
 		SetOverwrite off ;Do not overwrite Config files
@@ -66,16 +68,23 @@ ShowUnInstDetails show
 
     Section -Post
 		WriteUninstaller "$INSTDIR\uninst.exe"
-		
+		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "BatMon" /T INFORMATION /ID 1000  /D "Plugin $(^Name) ${PRODUCT_VERSION} Installed Successfully"'
+
+		SetRegView 32
         WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Version" "&{Plugin.AssemblyVersion}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
 	SectionEnd
 
+	Function .onInit
+		SetRegView 32
+		StrCpy $INSTDIR "$INSTDIR\&{Plugin.AssemblyName}"
+	FunctionEnd
 ############################
 ## Uninstall
 ############################
 	Function un.onUninstSuccess
 		HideWindow
+		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "BatMon" /T INFORMATION /ID 1000  /D "Plugin $(^Name) ${PRODUCT_VERSION} Uninstalled Successfully"'
 		;GUI Confirm Success. Skipped if Silent parameter passed
 		MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer." /SD IDOK
 	FunctionEnd

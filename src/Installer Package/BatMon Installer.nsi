@@ -8,7 +8,8 @@
 ####################################################################
 
 ;Required modules
-!include MUI2.nsh
+!include "MUI2.nsh"
+!include "FileFunc.nsh"
 !include "strExplode.nsh"
 !include "DotNetVersion.nsh"
 !include "LogicLib.nsh"
@@ -18,6 +19,7 @@
 !define PRODUCT_NAME "&{BatMon.AssemblyTitle}"
 !define PRODUCT_VERSION "&{BatMon.AssemblyVersion}"
 !define PRODUCT_PUBLISHER "&{BatMon.AssemblyCompany}"
+!define PRODUCT_WEB_SITE "https://github.com/fatalwall/BatMon"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
 
@@ -32,6 +34,7 @@
 !insertmacro MUI_PAGE_LICENSE "LICENSE"
 !insertmacro MUI_PAGE_DIRECTORY
 Page Custom PluginsShow PluginsLeave
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 
@@ -53,8 +56,11 @@ Var PluginCounter
 Var PluginVersion
 Var PluginCurVersion
 Var PluginChecked
+Var PluginDisableCheck
 Var PluginName
 Var PluginUninstaller
+Var argPlugins
+Var argPlugin
 
 ReserveFile `Plugins.ini`
 
@@ -64,13 +70,14 @@ ReserveFile `Plugins.ini`
 ############################
 	Section "!.Net 4.7" Net4
 		SectionIn RO
+		SetOutPath "$PLUGINSDIR"
 		SetOverwrite on
 
 		${DotNetVersion} $0 '4' '7' '*'
 		${If} $0 == "FALSE"
-			File "/oname=$EXEDIR\.Net 4.7 Framework\NDP47-KB3186500-Web.exe" "..\..\Dependencies\.Net 4.7 Framework\NDP47-KB3186500-Web.exe"
+			File "/oname=$PLUGINSDIR\NDP47-KB3186500-Web.exe" "..\..\Dependencies\.Net 4.7 Framework\NDP47-KB3186500-Web.exe"
 			DetailPrint "Installing .Net Framework 4.7 (Installation will take several minutes)"
-			nsExec::Exec '"$EXEDIR\.Net 4.7 Framework\NDP47-KB3186500-Web.exe" /q /norestart'
+			nsExec::Exec '"$PLUGINSDIR\NDP47-KB3186500-Web.exe" /q /norestart'
 		${Else}
 			DetailPrint ".Net Framework 4.7 or greater already installed"
 		${EndIf}
@@ -78,23 +85,34 @@ ReserveFile `Plugins.ini`
 
 	Section "BatMon Core Files (Required)" core
 		SectionIn RO
-		;Check if Upgrade/Repair
-		;FIXME
+		SetRegView 32
+		SetOutPath "$INSTDIR"
+		;Remove Service if it exists
+		SimpleSC::ExistsService "$(^Name)"
+		Pop $0 ; = 0 Exists, <> 0 Doesnt Exist
+		${if} $0 = 0
+			;Service Exists
+			SimpleSc::StopService "$(^Name)" 1 30
+			;SimpleSC::RemoveService "$(^Name)"
+			nsExec::Exec '"$INSTDIR\BatMon.exe" uninstall'
+		${EndIf}
 
 		;Write Service Files
-		File "/oname=$INSTDIR\BatMon.exe" "..\..\..\BatMon\bin\Release\BatMon.exe"
-		File "/oname=$INSTDIR\BatMon.Framework.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.dll"
-		File "/oname=$INSTDIR\BatMon.Framework.Web.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.Web.dll"
-		File "/oname=$INSTDIR\Nancy.dll" "..\..\..\BatMon\bin\Release\Nancy.dll"
-		File "/oname=$INSTDIR\Nancy.Hosting.Self.dll" "..\..\..\BatMon\bin\Release\Nancy.Hosting.Self.dll"
-		File "/oname=$INSTDIR\Newtonsoft.Json.dll" "..\..\..\BatMon\bin\Release\Newtonsoft.Json.dll"
-		File "/oname=$INSTDIR\NLog.dll" "..\..\..\BatMon\bin\Release\NLog.dll"
+		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "log4net.dll" "..\..\..\BatMon\bin\&{BatMon.BuildType}\*"
+		; File "/oname=$INSTDIR\BatMon.exe" "..\..\..\BatMon\bin\Release\BatMon.exe"
+		; File "/oname=$INSTDIR\BatMon.Framework.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.dll"
+		; File "/oname=$INSTDIR\BatMon.Framework.Web.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.Web.dll"
+		; File "/oname=$INSTDIR\Nancy.dll" "..\..\..\BatMon\bin\Release\Nancy.dll"
+		; File "/oname=$INSTDIR\Nancy.Hosting.Self.dll" "..\..\..\BatMon\bin\Release\Nancy.Hosting.Self.dll"
+		; File "/oname=$INSTDIR\Newtonsoft.Json.dll" "..\..\..\BatMon\bin\Release\Newtonsoft.Json.dll"
+		; File "/oname=$INSTDIR\NLog.dll" "..\..\..\BatMon\bin\Release\NLog.dll"
 		SetOverwrite off ;Do not overwrite Config files
 		File "/oname=$INSTDIR\BatMon.exe.config" "..\..\Default Config\BatMon.exe.config"
 		SetOverwrite on ;Allow Over files
 
 		;Create Service
-		SimpleSC::InstallService "$(^Name)" "BatMon (System Monitor)" "16" "2" "$INSTDIR\BatMon.exe" "" "" ""
+		;SimpleSC::InstallService "$(^Name)" "BatMon (System Monitor)" "16" "2" "$INSTDIR\BatMon.exe" "" "" ""
+		nsExec::Exec '"$INSTDIR\BatMon.exe" install'
 		Pop $0
 		IntCmp $0 0 +3
 		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not create service." /SD IDOK
@@ -108,28 +126,30 @@ ReserveFile `Plugins.ini`
 
 	Section "Plugins" plgn
 		SectionIn RO
-		;Silent option setting
-		IfSilent 0 plgn_Process
-			;FIXME
-		plgn_Process:
+		SetRegView 32
+		SetOutPath "$PLUGINSDIR"
 		;This function loops through all plugin list items and installs, uninstalls, or skips based on whats needed
-		SetOutPath "$EXEDIR\Plugins"
 		File /r "Plugins\*"
 		StrCpy $PluginCounter 0
 		${Do}
 			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+			;Clear Variables
+			StrCpy $PluginVersion ""
+			StrCpy $PluginCurVersion ""
+			StrCpy $PluginChecked ""
 
 			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
 			${If} $PluginName == ``
 				${ExitDo} ;End of list. Exit loop
 			${EndIf}
-			ReadINIStr $PluginVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem1`
-			ReadINIStr $PluginCurVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem2`
+			ReadINIStr $PluginVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem2`
+			ReadINIStr $PluginCurVersion `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem3`
 			ReadINIStr $PluginChecked `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked`
 
 			${If} $PluginChecked = 1
 				;Run Plugin Installer
-				ExecWait `"$EXEDIR\$PluginName $PluginVersion.exe" /S /D=$INSTDIR\Plugins` $0
+				nsExec::Exec `"$PLUGINSDIR\$PluginName $PluginVersion.exe" /S /D=$INSTDIR\Plugins` 
+				Pop $0
 				${If} $0 = 0
 					DetailPrint "$PluginName Successfully Installed"
 				${Else}
@@ -139,7 +159,10 @@ ReserveFile `Plugins.ini`
 				${IfNot} $PluginCurVersion == ``
 					;Uninstall the plugin
 					ReadRegStr $PluginUninstaller HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "UninstallString"
-					ExecWait `"$PluginUninstaller" /S` $0
+					MessageBox MB_OK "Running Uninstaller $PluginUninstaller"
+					nsExec::Exec `"$PluginUninstaller" /S` 
+					Pop $0
+					MessageBox MB_OK "Installer Exit Code $0"
 					${If} $0 = 0
 						DetailPrint "$PluginName Successfully Uninstalled"
 					${Else}
@@ -152,24 +175,106 @@ ReserveFile `Plugins.ini`
 
 	Section -Post
 		WriteUninstaller "$INSTDIR\uninst.exe"
+		${ifNot} "$EXEPATH" == "$INSTDIR\inst.exe"
+			CopyFiles "$EXEPATH" "$INSTDIR\inst.exe"
+		${EndIf}
+		SetRegView 32
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
+		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "ModifyPath" "$INSTDIR\inst.exe"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
+		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\${PRODUCT_NAME}.exe"
+
+		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "$(^Name)" /T INFORMATION /ID 1000  /D "$(^Name) ${PRODUCT_VERSION} Installed Successfully"'
 
 		;Start Service
 		SimpleSC::StartService "$(^Name)" "" 30
 		Pop $0
-		IntCmp $0 0 +3
-		MessageBox MB_OK|MB_ICONSTOP "$(^Name) installation failed: could not start service." /SD IDOK
-		Abort
-		DetailPrint "BatMon Service started successfully"
+		ClearErrors
+		${IfNot} $0 = 0
+			DetailPrint "BatMon Service could not start"
+			MessageBox MB_OK|MB_ICONSTOP "$(^Name): could not start service." /SD IDOK
+		${Else}
+			DetailPrint "BatMon Service started successfully"
+		${EndIf}
 	SectionEnd
 
 	Function .onInit
+		SetRegView 32
 		InitPluginsDir
 		File `/oname=$PLUGINSDIR\Plugins.ini` `Plugins.ini`
+
+		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon1` `$EXEDIR\icon1.ico`
+ 		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon2` `$EXEDIR\icon2.ico`
+
+		############################
+		## /P "Comma,Seperated,List"
+		############################
+		${GetParameters} $R0
+		${GetOptions} $R0 "/ALL" $argPlugins
+		IfErrors No_PALL_Parameter 0
+
+		;Mark all Checked Value to 0
+		StrCpy $PluginCounter 0
+		${Do}
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1`
+		${Loop}
+		No_PALL_Parameter:
+		############################
+		## /P "Comma,Seperated,List"
+		############################
+		${GetParameters} $R0
+		${GetOptions} $R0 "/P" $argPlugins
+		${If} ${Errors}
+			Goto No_Plugins_Parameter
+		${EndIf}
+
+		;Mark all Checked Value to 0
+		StrCpy $PluginCounter 0
+		${Do}
+			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+			ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+			${If} $PluginName == ``
+				${ExitDo} ;End of list. Exit loop
+			${EndIf}
+			ReadINIStr $PluginDisableCheck `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `DisableCheck`
+			${If} $PluginDisableCheck <> 1
+				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `0`
+			${EndIf}
+		${Loop}
+
+		${strExplode} $1  "," "$argPlugins"
+		${If} $1 > 0
+			${do}
+				Pop $argPlugin
+				${If} ${Errors}
+					ClearErrors
+					${ExitDo}
+				${EndIf}
+				;Update Checked Value to 1
+				StrCpy $PluginCounter 0
+				${Do}
+					IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
+					ReadINIStr $PluginName `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Text`
+					${If} $PluginName == ``
+						ClearErrors
+						GoTo ExitDoOneLeve ;End of list. Exit loop
+					${EndIf}
+					${If} $PluginName == $argPlugin
+						WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1`
+					${EndIf}
+				${Loop}
+				ExitDoOneLeve:
+			${loop}
+		${EndIf}
+		No_Plugins_Parameter:
 	FunctionEnd
 
 ############################
@@ -189,7 +294,7 @@ ReserveFile `Plugins.ini`
 		
 			ReadRegStr $PluginCurVersion HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "Version"
 			${IfNot} $PluginCurVersion == ``
-				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem2` `$PluginCurVersion`
+				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `SubItem3` `$PluginCurVersion`
 				WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1` 
 			${EndIf}
 		${Loop}
@@ -217,7 +322,7 @@ ReserveFile `Plugins.ini`
 			${If} $R0 == /END
 				${ExitDo} ;End of list. Exit loop
 			${EndIf}
-			WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $PluginCounter` `Checked` `1` 
+			WriteINIStr `$PLUGINSDIR\Plugins.ini` `Item $R0` `Checked` `1` 
 		${Loop}
 	FunctionEnd
 
@@ -227,6 +332,7 @@ ReserveFile `Plugins.ini`
 	Function un.onUninstSuccess
 		HideWindow
 		;GUI Confirm Success. Skipped if Silent parameter passed
+		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "$(^Name)" /T INFORMATION /ID 1000  /D "$(^Name) ${PRODUCT_VERSION} Uninstalled Successfully"'
 		MessageBox MB_ICONINFORMATION|MB_OK "$(^Name) was successfully removed from your computer." /SD IDOK
 	FunctionEnd
 
@@ -247,11 +353,18 @@ ReserveFile `Plugins.ini`
 		Pop $0
 		IntCmp $0 0 +1 SkipService
 		;Stop Service
-		SimpleSC::StopService "$(^Name)" 1 30
+		SimpleSC::ServiceIsRunning "$(^Name)"
 		Pop $0
-		IntCmp $0 0 +3
-		MessageBox MB_OK|MB_ICONSTOP "$(^Name) uninstall failed: could not stop service." /SD IDOK
-		Abort
+		${If} $0 = 0
+			Pop $1
+			${If} $1 = 1
+				SimpleSC::StopService "$(^Name)" 1 30
+				Pop $0
+				IntCmp $0 0 +3
+				MessageBox MB_OK|MB_ICONSTOP "$(^Name) uninstall failed: could not stop service." /SD IDOK
+				Abort
+			${EndIf}
+		${EndIf}
 		;Delete Service
 		SimpleSC::RemoveService "$(^Name)"
 		Pop $0
@@ -306,6 +419,7 @@ ReserveFile `Plugins.ini`
 		Delete "$INSTDIR\uninst.exe"
 		;Delete installation folder if empty
 		RMDir /r /REBOOTOK "$INSTDIR"
+		RMDir /REBOOTOK "$INSTDIR"
 		;Delete Add/Remove Programs registry keys
 		DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
 		

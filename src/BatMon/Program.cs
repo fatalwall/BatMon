@@ -7,10 +7,13 @@
  * this file. If not, visit : https://github.com/fatalwall/BatMon
  */
 
-using System.ServiceProcess;
+
+using Topshelf.Nancy;
+using Topshelf;
 
 namespace BatMon
 {
+    
     static class Program
     {
         /// <summary>
@@ -18,12 +21,31 @@ namespace BatMon
         /// </summary>
         static void Main()
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[]
+
+            var host = HostFactory.New(x =>
             {
-                new BatMonService()
-            };
-            ServiceBase.Run(ServicesToRun);
+                x.UseNLog();
+
+                x.Service<BatMonService>(s =>
+                {
+                    s.ConstructUsing(settings => new BatMonService());
+                    s.WhenStarted(service => service.Start());
+                    s.WhenStopped(service => service.Stop());
+                    s.WithNancyEndpoint(x, c =>
+                    {
+                        c.AddHost(port: BatMonPluginManager.Settings.Port);
+                        c.CreateUrlReservationsOnInstall();
+                        c.OpenFirewallPortsOnInstall(firewallRuleName: "BatMon");
+                    });
+                });
+                x.StartAutomatically();
+                x.SetServiceName("BatMon");
+                x.SetDisplayName("BatMon (System Monitor)");
+                x.SetDescription("Web Services providing JSON feeds for monitoring.");
+                x.RunAsLocalSystem();
+            });
+
+            host.Run();
         }
     }
 }

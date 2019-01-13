@@ -30,7 +30,7 @@ namespace BatMon
             }
         }
 
-        private static readonly BatMonSection settings = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Sections.OfType<BatMonSection>().FirstOrDefault() as BatMonSection;
+        private static readonly BatMonSection settings = (ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Sections.OfType<BatMonSection>().FirstOrDefault() as BatMonSection) ?? new BatMonSection();
         public static BatMonSection Settings
         {
             get
@@ -41,13 +41,13 @@ namespace BatMon
 
         [ImportMany]
         private IEnumerable<Lazy<IBatMonPlugin, IMetadata>> modules;
-        public IEnumerable<Lazy<IBatMonPlugin, IMetadata>> Plugins { get { return modules.OrderBy(m => m.Value.About.dllName + "." + m.Value.About.className); } }
+        public IEnumerable<Lazy<IBatMonPlugin, IMetadata>> Plugins { get { return modules?.OrderBy(m => m.Value.About.dllName + "." + m.Value.About.className) ?? null; } }
 
         public Lazy<IBatMonPlugin, IMetadata> this[string NameOrClass]
         {
             get
             {
-                foreach (var p in Plugins)
+                foreach (Lazy<IBatMonPlugin, IMetadata> p in Plugins)
                 {
                     if (p.Metadata.Name == NameOrClass || p.Value.About.className == NameOrClass)
                         return p;

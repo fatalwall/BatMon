@@ -8,6 +8,7 @@ $sourceFileName = 'Plugin Installer.nsi'
 $sourceFile = $sourceDir + $sourceFileName
 $workingDir = $sourceDir + 'bin\' + $ConfigurationName + '\'
 $workingFile = $workingDir + 'Plugin_' + $ProjectName + '.nsi'
+$ErrorCode = 0
 
 set-location "$sourceDir"
 
@@ -55,10 +56,15 @@ $Product = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 $output = cmd /c "`"C:\Program Files (x86)\NSIS\makensis.exe`" `"$workingFile`"" 2`>`&1
 if ($output -like '*Total size:*bytes*')
 { $output = 'NSIS script successfully compiled for ' + $ProjectName }
+else { $ErrorCode += -1 }
 Write $output
 
 # Insert/Update Plugins.ini
-$args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '"';
+$args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 ""';
 $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
 $output = 'Updating Plugins.ini: ' + $output
+if ($output -like '*File saved successfully:*') {}
+else { $ErrorCode += -2 }
 Write $output
+
+exit $ErrorCode

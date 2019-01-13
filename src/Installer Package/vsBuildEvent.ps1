@@ -45,20 +45,9 @@ $args = $SolutionDir + 'BatMon\bin\'+ $ConfigurationName + '\BatMon.exe' + ' Pro
 $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 (gc "$workingFile") -replace '&{BatMon.AssemblyTitle}', "$output" | Out-File "$workingFile"
 
+# &{BatMon.BuildType}
+(gc "$workingFile") -replace '&{BatMon.BuildType}', "$ConfigurationName" | Out-File "$workingFile"
 
-<#
-#	Insert Assembly Varables
-#	Plugins
-#>
-# BatMon.AllPlugins
-$args = $SolutionDir + 'BatMon.AllPlugins\bin\'+ $ConfigurationName + '\BatMon.AllPlugins.dll' + ' Version';
-$output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
-(gc "$workingFile") -replace '&{BatMon.AllPlugins.AssemblyVersion}', "$output" | Out-File "$workingFile"
-
-# BatMon.ScheduledTasks
-$args = $SolutionDir + 'BatMon.ScheduledTasks\bin\'+ $ConfigurationName + '\BatMon.ScheduledTasks.dll' + ' Version';
-$output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
-(gc "$workingFile") -replace '&{BatMon.ScheduledTasks.AssemblyVersion}', "$output" | Out-File "$workingFile"
 
 
 <#
@@ -67,4 +56,7 @@ $output = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 $output = cmd /c "`"C:\Program Files (x86)\NSIS\makensis.exe`" `"$workingFile`"" 2`>`&1
 if ($output -like '*Total size:*bytes*')
 { $output = 'NSIS script successfully compiled for BatMon' }
-Write $output
+else { $ErrorCode += -1 }
+Write-Output $output
+
+exit $ErrorCode

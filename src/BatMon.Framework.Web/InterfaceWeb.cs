@@ -83,20 +83,23 @@ namespace BatMon.Framework.Web
                 t = t + @"<div class='WidgetWrapperFill'>";
                 t = t + @"<div class='Widget' id='HealthReport'>";
                 t = t + string.Format(@"<div class='header'>{0}</div>", "Health Report");
-                t = t + @"<script type='text/javascript'>";
-                t = t + @"google.charts.load('current', { 'packages':['corechart']});";
-                pluginManager.RunAll();
-                foreach (var p in pluginManager.Plugins.Where(i => i.Value.Results.Values.Count > 0))
+                if (pluginManager.RunAll().Count > 0)
                 {
-                    t = t + p.Value.htmlPieChart();
+                    t = t + @"<script type='text/javascript'>";
+                    t = t + @"google.charts.load('current', { 'packages':['corechart']});";
+                    foreach (var p in pluginManager.Plugins.Where(i => i.Value.Results.Values.Count > 0))
+                    {
+                        t = t + p.Value.htmlPieChart();
+                    }
+                
+                    t = t + @"</script>";
+                    t = t + "<div class='PieChartWrapper'>";
+                    foreach (var p in pluginManager.Plugins.Where(i => i.Value.Results.Values.Count > 0))
+                    {
+                        t = t + string.Format("<div class='PieChart' id='{0}'></div>", p.Metadata.Name);
+                    }
+                    t = t + @"</div>";
                 }
-                t = t + @"</script>";
-                t = t + "<div class='PieChartWrapper'>";
-                foreach (var p in pluginManager.Plugins.Where(i => i.Value.Results.Values.Count > 0))
-                {
-                    t = t + string.Format("<div class='PieChart' id='{0}'></div>", p.Metadata.Name);
-                }
-                t = t + @"</div>";
                 t = t + @"</div>";
                 t = t + @"</div>";
 
@@ -127,7 +130,7 @@ namespace BatMon.Framework.Web
                 t = t + string.Format(@"<td>{0}</td>", Environment.ProcessorCount);
                 t = t + string.Format(@"<td>{0} GB</td>", TotalMem / 1024 / 1024 / 1024);
                 t = t + string.Format(@"<td>{0}%</td>", MemPercent);
-                t = t + @"</tr>";   
+                t = t + @"</tr>";
                 t = t + @"</tbody>";
                 t = t + @"</table>";
                 t = t + @"</div>";
@@ -149,7 +152,7 @@ namespace BatMon.Framework.Web
                     t = t + string.Format(@"<tr class='{1}' id='{0}'>", drive.Name, percent >= 95 ? "Critical" : percent >= 85 ? "Warning" : "Good");
                     t = t + string.Format(@"<td>{0}</td>", drive.Name);
                     t = t + string.Format(@"<td>{0}</td>", drive.DriveType);
-                    t = t + string.Format(@"<td>{0} GB</td>", drive.TotalSize/1024/1024/1024);
+                    t = t + string.Format(@"<td>{0} GB</td>", drive.TotalSize / 1024 / 1024 / 1024);
                     t = t + string.Format(@"<td>{0}%</td>", percent);
                     t = t + @"</tr>";
                 }
@@ -163,9 +166,9 @@ namespace BatMon.Framework.Web
                 return getHeader() + t + getFooter();
             };
 
-             //Displays a list of all plugins registered
+            //Displays a list of all plugins registered
             Get["/plugin"] = x =>
-            { 
+            {
                 if (Request.Query["json"].HasValue)
                 {
                     var responce = (Response)JsonConvert.SerializeObject(pluginManager.AboutAll());
@@ -201,53 +204,56 @@ namespace BatMon.Framework.Web
             };
 
             //BatMonPlugin Dynamically added addresses
-            foreach (var p in pluginManager.Plugins)
-            {
-                Get[string.Format("/Plugin/{0}",p.Metadata.Name)] = x =>
+            if (!(pluginManager.Plugins is null))
+            { 
+                foreach (Lazy<IBatMonPlugin, IMetadata> p in pluginManager.Plugins)
                 {
-                    if (Request.Query["json"].HasValue)
-                    {
-                        p.Value.Run();
-                        var responce = (Response)JsonConvert.SerializeObject(p.Value.Results.Values);
-                        responce.ContentType = "application/json";
-                        return responce;
-                    }
-                    else if (Request.Query["appd"].HasValue)
-                    {
-                        p.Value.Run(); 
-                        var responce = (Response)p.Value.Results.ToAppD();
-                        responce.ContentType = "application/json";
-                        return responce;
-                    }
-                    else
-                    {
-                        string t = "<link rel='stylesheet' href='/css/table.css' />";
-                        t = t + @"<table class='blueTable'>";
-                        t = t + @"<thead>";
-                        t = t + @"<tr>";
-                        foreach (var field in p.Value.Results.Fields)
-                        {
-                            t = t + string.Format(@"<th>{0}</th>", field.Label);
-                        }
-                        t = t + @"</tr>";
-                        t = t + @"</thead>";
-                        t = t + @"<tbody>";
-                        foreach (var value in p.Value.Results.Values)
-                        {
-                            t = t + string.Format(@"<tr class='{0}'>", value.ErrorCode);
-                            t = t + string.Format(@"<td>{0}</td>", value.ApplicationName);
-                            t = t + string.Format(@"<td>{0}</td>", value.TierName);
-                            t = t + string.Format(@"<td>{0}</td>", value.ProcessName);
-                            t = t + string.Format(@"<td>{0}</td>", value.ErrorCode);
-                            t = t + string.Format(@"<td>{0}</td>", value.ErrorDescription);
-                            t = t + @"</tr>";
-                        }
-                        t = t + @"</tbody>";
-                        t = t + @"</table>";
+                    Get[string.Format("/Plugin/{0}", p.Metadata.Name)] = x =>
+                     {
+                         if (Request.Query["json"].HasValue)
+                         {
+                             p.Value.Run();
+                             var responce = (Response)JsonConvert.SerializeObject(p.Value.Results.Values);
+                             responce.ContentType = "application/json";
+                             return responce;
+                         }
+                         else if (Request.Query["appd"].HasValue)
+                         {
+                             p.Value.Run();
+                             var responce = (Response)p.Value.Results.ToAppD();
+                             responce.ContentType = "application/json";
+                             return responce;
+                         }
+                         else
+                         {
+                             string t = "<link rel='stylesheet' href='/css/table.css' />";
+                             t = t + @"<table class='blueTable'>";
+                             t = t + @"<thead>";
+                             t = t + @"<tr>";
+                             foreach (var field in p.Value.Results.Fields)
+                             {
+                                 t = t + string.Format(@"<th>{0}</th>", field.Label);
+                             }
+                             t = t + @"</tr>";
+                             t = t + @"</thead>";
+                             t = t + @"<tbody>";
+                             foreach (var value in p.Value.Results.Values)
+                             {
+                                 t = t + string.Format(@"<tr class='{0}'>", value.ErrorCode);
+                                 t = t + string.Format(@"<td>{0}</td>", value.ApplicationName);
+                                 t = t + string.Format(@"<td>{0}</td>", value.TierName);
+                                 t = t + string.Format(@"<td>{0}</td>", value.ProcessName);
+                                 t = t + string.Format(@"<td>{0}</td>", value.ErrorCode);
+                                 t = t + string.Format(@"<td>{0}</td>", value.ErrorDescription);
+                                 t = t + @"</tr>";
+                             }
+                             t = t + @"</tbody>";
+                             t = t + @"</table>";
 
-                        return getHeader() + t + getFooter();
-                    }
-                };
+                             return getHeader() + t + getFooter();
+                         }
+                     };
+                }
             }
         }
     }
