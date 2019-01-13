@@ -227,6 +227,7 @@ namespace BatMon.Framework.Web
                          }
                          else
                          {
+                             p.Value.Run();
                              string t = "<link rel='stylesheet' href='/css/table.css' />";
                              t = t + @"<table class='blueTable'>";
                              t = t + @"<thead>";

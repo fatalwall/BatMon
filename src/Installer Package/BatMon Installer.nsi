@@ -190,6 +190,7 @@ ReserveFile `Plugins.ini`
 		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "$(^Name)" /T INFORMATION /ID 1000  /D "$(^Name) ${PRODUCT_VERSION} Installed Successfully"'
 
 		;Start Service
+		DetailPrint "Starting Service"
 		SimpleSC::StartService "$(^Name)" "" 30
 		Pop $0
 		ClearErrors

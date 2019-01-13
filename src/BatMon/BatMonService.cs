@@ -5,6 +5,8 @@ namespace BatMon
     {
         public bool Start()
         {
+            var t = BatMonPluginManager.getCurrentInstance;
+            t.DoImport();
             return true;
         }
 
