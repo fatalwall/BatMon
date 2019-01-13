@@ -65,6 +65,9 @@ $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
 $output = 'Updating Plugins.ini: ' + $output
 if ($output -like '*File saved successfully:*') {}
 else { $ErrorCode += -2 }
-Write $output
+Write-Output $output
+Write-Output $Product
+Write-Output $Company
+Write-Output $Version
 
 exit $ErrorCode

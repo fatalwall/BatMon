@@ -99,13 +99,7 @@ ReserveFile `Plugins.ini`
 
 		;Write Service Files
 		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "log4net.dll" "..\..\..\BatMon\bin\&{BatMon.BuildType}\*"
-		; File "/oname=$INSTDIR\BatMon.exe" "..\..\..\BatMon\bin\Release\BatMon.exe"
-		; File "/oname=$INSTDIR\BatMon.Framework.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.dll"
-		; File "/oname=$INSTDIR\BatMon.Framework.Web.dll" "..\..\..\BatMon\bin\Release\BatMon.Framework.Web.dll"
-		; File "/oname=$INSTDIR\Nancy.dll" "..\..\..\BatMon\bin\Release\Nancy.dll"
-		; File "/oname=$INSTDIR\Nancy.Hosting.Self.dll" "..\..\..\BatMon\bin\Release\Nancy.Hosting.Self.dll"
-		; File "/oname=$INSTDIR\Newtonsoft.Json.dll" "..\..\..\BatMon\bin\Release\Newtonsoft.Json.dll"
-		; File "/oname=$INSTDIR\NLog.dll" "..\..\..\BatMon\bin\Release\NLog.dll"
+		 
 		SetOverwrite off ;Do not overwrite Config files
 		File "/oname=$INSTDIR\BatMon.exe.config" "..\..\Default Config\BatMon.exe.config"
 		SetOverwrite on ;Allow Over files
