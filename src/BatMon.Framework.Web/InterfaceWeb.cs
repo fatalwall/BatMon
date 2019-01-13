@@ -29,7 +29,8 @@ namespace BatMon.Framework.Web
             List<Uri> uriResults = new List<Uri>();
             uriResults.Add(new Uri(string.Format("http://{0}:{1}", "localhost", Port)));
             uriResults.Add(new Uri(string.Format("http://{0}:{1}", Dns.GetHostName(), Port)));
-            uriResults.Add(new Uri(string.Format("http://{0}:{1}", Dns.GetHostEntry("").HostName, Port)));
+            if (Dns.GetHostEntry("").HostName != Dns.GetHostName())
+                uriResults.Add(new Uri(string.Format("http://{0}:{1}", Dns.GetHostEntry("").HostName, Port)));
             foreach (string ip in NetworkInterface.GetAllNetworkInterfaces()
                                     .Where(i => i.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 || i.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
                                     .SelectMany(i => i.GetIPProperties().UnicastAddresses)
@@ -146,7 +147,7 @@ namespace BatMon.Framework.Web
                 t = t + @"</tr>";
                 t = t + @"</thead>";
                 t = t + @"<tbody>";
-                foreach (var drive in DriveInfo.GetDrives().Where(i => i.IsReady == true))
+                foreach (var drive in DriveInfo.GetDrives().Where(i => i.IsReady == true && i.DriveType != DriveType.CDRom))
                 {
                     int percent = (int)(((double)(drive.TotalSize - drive.TotalFreeSpace) / drive.TotalSize) * 100);
                     t = t + string.Format(@"<tr class='{1}' id='{0}'>", drive.Name, percent >= 95 ? "Critical" : percent >= 85 ? "Warning" : "Good");
