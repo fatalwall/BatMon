@@ -87,7 +87,21 @@ namespace BatMon.ScheduledTasks
         protected override Result[] fetchResults()
         {
             //create a fallback if no section exists in the app.config so that it will look for a ScheduledTasks.config
-            var settings = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection ?? ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection;
+            ScheduledTasksSection settings;
+            try
+            { settings = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection ?? ConfigurationManager.OpenExeConfiguration(Assembly.GetExecutingAssembly().Location).Sections.OfType<ScheduledTasksSection>().FirstOrDefault() as ScheduledTasksSection; }
+            catch (ConfigurationException cEx)
+            {
+                logger.Error(cEx, string.Format("Unable to load configuration {0}", Assembly.GetExecutingAssembly().Location + ".config"));
+                settings = new ScheduledTasksSection();
+            }
+            if (settings is null)
+            {
+                logger.Error(string.Format("Unable to load configuration {0}", Assembly.GetExecutingAssembly().Location + ".config"));
+                settings = new ScheduledTasksSection();
+            }
+            logger.Trace(string.Format("ScheduledTasks Configuration loaded with {0} Result Codes and {1} Folder Filters", settings.ResultCodes.Count(), settings.FolderFilters.Count()));
+
 
             if (settings.InitialStageResultCodes.Enabled == true)
             {
@@ -98,6 +112,7 @@ namespace BatMon.ScheduledTasks
             List<Result> r = new List<Result>();
             using (TaskService ts = new TaskService())
             {
+                logger.Trace(string.Format("ScheduledTasks has detected {0} Tasks", ts.AllTasks.Count()));
                 //Initialize logging
                 foreach (Task t in ts.AllTasks)
                 {

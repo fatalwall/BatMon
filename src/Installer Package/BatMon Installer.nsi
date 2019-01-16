@@ -64,6 +64,16 @@ Var argPlugin
 
 ReserveFile `Plugins.ini`
 
+############################
+## File Details
+############################
+	VIProductVersion "&{BatMon.ProductVersion}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "&{BatMon.AssemblyTitle}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "&{BatMon.AssemblyCompany}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "&{BatMon.AssemblyCopyright}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "&{BatMon.AssemblyDescription}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "&{BatMon.AssemblyVersion}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "&{BatMon.AssemblyVersion}"
 
 ############################
 ## Install
@@ -78,6 +88,32 @@ ReserveFile `Plugins.ini`
 			File "/oname=$PLUGINSDIR\NDP47-KB3186500-Web.exe" "..\..\Dependencies\.Net 4.7 Framework\NDP47-KB3186500-Web.exe"
 			DetailPrint "Installing .Net Framework 4.7 (Installation will take several minutes)"
 			nsExec::Exec '"$PLUGINSDIR\NDP47-KB3186500-Web.exe" /q /norestart'
+			Pop $0
+			${Switch} $0
+				${Case} 0
+					DetailPrint "Successfully installed .Net Framework 4.7"
+					${Break}
+				${Case} 1602
+					DetailPrint "The user canceled installation of .Net Framework 4.7"
+					Abort
+					${Break}
+				${Case} 1603
+					DetailPrint "A fatal error occurred during installation of .Net Framework 4.7"
+					Abort
+					${Break}
+				${Case} 1641
+				${Case} 3010
+					DetailPrint "A restart is required before you can install BatMon"
+					Abort
+					${Break}
+				${Case} 5100
+					DetailPrint "The user's computer does not meet system requirements"
+					Abort
+					${Break}
+				${Default}
+					DetailPrint ".Net Framework 4.7 failed to install with exit code $0"
+					${Break}
+			${EndSwitch}
 		${Else}
 			DetailPrint ".Net Framework 4.7 or greater already installed"
 		${EndIf}
@@ -98,7 +134,7 @@ ReserveFile `Plugins.ini`
 		${EndIf}
 
 		;Write Service Files
-		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "log4net.dll" "..\..\..\BatMon\bin\&{BatMon.BuildType}\*"
+		File /r /x "*.pdb" /x "*.config" /x "*.xml" /x "log4net.dll" /x "Plugins" "..\..\..\BatMon\bin\&{BatMon.BuildType}\*"
 		 
 		SetOverwrite off ;Do not overwrite Config files
 		File "/oname=$INSTDIR\BatMon.exe.config" "..\..\Default Config\BatMon.exe.config"
@@ -142,7 +178,7 @@ ReserveFile `Plugins.ini`
 
 			${If} $PluginChecked = 1
 				;Run Plugin Installer
-				nsExec::Exec `"$PLUGINSDIR\$PluginName $PluginVersion.exe" /S /D=$INSTDIR\Plugins` 
+				nsExec::Exec `"$PLUGINSDIR\$PluginName.exe" /S /D=$INSTDIR\Plugins` 
 				Pop $0
 				${If} $0 = 0
 					DetailPrint "$PluginName Successfully Installed"
@@ -153,10 +189,8 @@ ReserveFile `Plugins.ini`
 				${IfNot} $PluginCurVersion == ``
 					;Uninstall the plugin
 					ReadRegStr $PluginUninstaller HKLM "${PRODUCT_UNINST_KEY}\Plugins\$PluginName" "UninstallString"
-					MessageBox MB_OK "Running Uninstaller $PluginUninstaller"
 					nsExec::Exec `"$PluginUninstaller" /S` 
 					Pop $0
-					MessageBox MB_OK "Installer Exit Code $0"
 					${If} $0 = 0
 						DetailPrint "$PluginName Successfully Uninstalled"
 					${Else}

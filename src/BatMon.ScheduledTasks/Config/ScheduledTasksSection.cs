@@ -19,8 +19,8 @@ namespace BatMon.ScheduledTasks.Config
             ClearItemsName = "Clear",
             RemoveItemName = "Remove")]
         public ResultCodeCollection ResultCodes
-        {
-            get { return (ResultCodeCollection)base["ResultCodes"]; }
+        { 
+            get { return ((ResultCodeCollection)base["ResultCodes"]) ?? new ResultCodeCollection(); }
         }
 
         [ConfigurationProperty("FolderFilters", IsDefaultCollection = false)]
@@ -30,7 +30,7 @@ namespace BatMon.ScheduledTasks.Config
             RemoveItemName = "Remove")]
         public FolderFilterCollection FolderFilters
         {
-            get { return (FolderFilterCollection)base["FolderFilters"]; }
+            get { return ((FolderFilterCollection)base["FolderFilters"]) ?? new FolderFilterCollection(); }
         }
 
         [ConfigurationProperty("Application")]
@@ -51,6 +51,6 @@ namespace BatMon.ScheduledTasks.Config
 
         [ConfigurationProperty("InitialStageResultCodes")]
         public InitialStageResultCodesElement InitialStageResultCodes
-        { get { return (InitialStageResultCodesElement)base["InitialStageResultCodes"]; } }
+        { get { return ((InitialStageResultCodesElement)base["InitialStageResultCodes"]) ?? new InitialStageResultCodesElement(false); } }
     }
 }

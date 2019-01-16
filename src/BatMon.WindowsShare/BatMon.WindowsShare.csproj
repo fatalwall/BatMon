@@ -51,14 +51,15 @@
       <Name>BatMon.Framework</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="dummy.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
+    <PostBuildEvent>REM Plugin FIles for debuging
+rmdir /s /q "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
+mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins"
+mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
+xcopy "$(ProjectDir)bin\$(ConfigurationName)" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)" /E /R /Y
+
+powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

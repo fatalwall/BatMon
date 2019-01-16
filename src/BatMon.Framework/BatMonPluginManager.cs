@@ -15,11 +15,13 @@ using System.Linq;
 using BatMon.Framework;
 using System.Configuration;
 using BatMon.Framework.Config;
+using NLog;
 
 namespace BatMon
 {
     public sealed class BatMonPluginManager
     {
+        Logger logger = LogManager.GetCurrentClassLogger();
 
         private static readonly BatMonPluginManager instance = new BatMonPluginManager();
         public static BatMonPluginManager getCurrentInstance
@@ -73,7 +75,7 @@ namespace BatMon
                 foreach (var path in System.IO.Directory.EnumerateDirectories(@".\Plugins", "*", System.IO.SearchOption.TopDirectoryOnly))
                 {
                     catalog.Catalogs.Add(new DirectoryCatalog(path));
-                }
+                }              
             }
             catch
             {
@@ -111,7 +113,6 @@ namespace BatMon
             if (!(modules is null))
             foreach (Lazy<IBatMonPlugin, IMetadata> com in Plugins.Where(p => !p.Metadata.isAggregate))
             {
-                Console.WriteLine(com.Metadata.Name);
                 if (com.Value.Run())
                 { result.AddRange(com.Value.Results.Values); }
             }

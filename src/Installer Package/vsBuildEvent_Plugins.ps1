@@ -25,6 +25,7 @@ copy "..\..\LICENSE"  -Destination (New-Item "$workingDir" -Type container -forc
 # Version
 $args = $SolutionDir + $ProjectName + '\bin\'+ $ConfigurationName + '\' + $ProjectName + '.dll' + ' Version';
 $Version = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
+(gc "$workingFile") -replace '&{Plugin.ProductVersion}', "$Version" | Out-File "$workingFile"
 if ($ConfigurationName -eq 'Release') {
     if($Version -match '\d*.\d*.\d*') { $Version = $matches[0] }
     (gc "$workingFile") -replace '&{Plugin.AssemblyVersion}', "$Version" | Out-File "$workingFile"
@@ -42,6 +43,20 @@ $args = $SolutionDir + $ProjectName + '\bin\'+ $ConfigurationName + '\' + $Proje
 $Product = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 (gc "$workingFile") -replace '&{Plugin.AssemblyTitle}', "$Product" | Out-File "$workingFile"
 
+# Copyright
+$args = $SolutionDir + $ProjectName + '\bin\'+ $ConfigurationName + '\' + $ProjectName + '.dll' + ' Copyright';
+$Copyright = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
+(gc "$workingFile") -replace '&{Plugin.AssemblyCopyright}', "$Copyright" | Out-File "$workingFile"
+
+# Year
+$Year = Get-Date -UFormat "%Y"
+(gc "$workingFile") -replace '&{Year}', "$Year" | Out-File "$workingFile"
+
+# Description
+$args = $SolutionDir + $ProjectName + '\bin\'+ $ConfigurationName + '\' + $ProjectName + '.dll' + ' Description';
+$Description = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
+(gc "$workingFile") -replace '&{Plugin.AssemblyDescription}', "$Description" | Out-File "$workingFile"
+
 # Assembly File Name
 (gc "$workingFile") -replace '&{Plugin.AssemblyName}', "$ProjectName" | Out-File "$workingFile"
 
@@ -57,17 +72,6 @@ $output = cmd /c "`"C:\Program Files (x86)\NSIS\makensis.exe`" `"$workingFile`""
 if ($output -like '*Total size:*bytes*')
 { $output = 'NSIS script successfully compiled for ' + $ProjectName }
 else { $ErrorCode += -1 }
-Write $output
-
-# Insert/Update Plugins.ini
-$args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 ""';
-$output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
-$output = 'Updating Plugins.ini: ' + $output
-if ($output -like '*File saved successfully:*') {}
-else { $ErrorCode += -2 }
 Write-Output $output
-Write-Output $Product
-Write-Output $Company
-Write-Output $Version
 
 exit $ErrorCode

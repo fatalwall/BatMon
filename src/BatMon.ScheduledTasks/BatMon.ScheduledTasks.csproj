@@ -74,16 +74,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dummy.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
+    <PostBuildEvent>REM Plugin FIles for debuging
+rmdir /s /q "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
+mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins"
+mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
+xcopy "$(ProjectDir)bin\$(ConfigurationName)" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)" /E /R /Y
+
+REM Copy Config file
+copy "$(SolutionDir)Installer Package\Default Config\BatMon.ScheduledTasks.dll.config" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)\BatMon.ScheduledTasks.dll.config" /Y
+
+REM Build Installer
+powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

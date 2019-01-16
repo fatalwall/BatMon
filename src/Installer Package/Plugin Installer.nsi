@@ -42,11 +42,22 @@
 
 ;Settings
 Name "${PRODUCT_NAME}"
-OutFile "Plugins\${PRODUCT_NAME} ${PRODUCT_VERSION}.exe"
+OutFile "Plugins\${PRODUCT_NAME}.exe"
 RequestExecutionLevel admin
 InstallDir "$PROGRAMFILES\BatMon\Plugins"
 ShowInstDetails show
 ShowUnInstDetails show
+
+############################
+## File Details
+############################
+	VIProductVersion "&{Plugin.ProductVersion}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductName" "&{Plugin.AssemblyTitle}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "CompanyName" "&{Plugin.AssemblyCompany}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "LegalCopyright" "&{Plugin.AssemblyCompany} &{Year}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "FileDescription" "&{Plugin.AssemblyDescription}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "&{Plugin.AssemblyVersion}"
+	VIAddVersionKey /LANG=${LANG_ENGLISH} "FileVersion" "&{Plugin.AssemblyVersion}"
 
 ############################
 ## Install

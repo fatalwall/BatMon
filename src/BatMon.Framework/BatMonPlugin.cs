@@ -42,7 +42,8 @@ namespace BatMon.Framework
             try
             {
                 Results = new MonitorResults();
-                Results.Values.AddRange(fetchResults());
+                Result[] r = fetchResults();
+                if (!(r is null)) Results.Values.AddRange(r);
                 return true;
             }
             catch (Exception ex)

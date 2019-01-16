@@ -10,17 +10,21 @@
 
 using Topshelf.Nancy;
 using Topshelf;
+using NLog;
+using System.Text;
 
 namespace BatMon
 {
     
     static class Program
     {
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
         static void Main()
         {
+            Logger logger = LogManager.GetCurrentClassLogger();
 
             var host = HostFactory.New(x =>
             {

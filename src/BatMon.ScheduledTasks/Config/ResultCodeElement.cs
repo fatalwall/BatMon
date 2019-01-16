@@ -14,7 +14,7 @@ namespace BatMon.ScheduledTasks.Config
 {
     public class ResultCodeElement : ConfigurationElement
     {
-        public ResultCodeElement() { }
+        public ResultCodeElement() {}
         public ResultCodeElement(String ExitCode, String AppDynamicsCode, String Description)
         {
             this.ExitCode = ExitCode;

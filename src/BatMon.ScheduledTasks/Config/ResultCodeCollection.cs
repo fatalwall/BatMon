@@ -14,6 +14,10 @@ namespace BatMon.ScheduledTasks.Config
 {
     public class ResultCodeCollection : ConfigurationElementCollection
     {
+        public ResultCodeCollection()
+        {
+            this.Add(new ResultCodeElement("", "Unconfigured", "No result code configuration could be found"));
+        }
         public int IndexOf(String ExitCode)
         {
             for (int idx = 0; idx < base.Count; idx++)
