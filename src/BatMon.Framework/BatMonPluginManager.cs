@@ -8,6 +8,7 @@
  */
 
 using System;
+using System.IO;
 using System.ComponentModel.Composition;
 using System.ComponentModel.Composition.Hosting;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ using BatMon.Framework;
 using System.Configuration;
 using BatMon.Framework.Config;
 using NLog;
+using System.Reflection;
 
 namespace BatMon
 {
@@ -122,32 +124,33 @@ namespace BatMon
 
         private static System.Reflection.Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var probingPath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(new Uri(assembly.GetName().CodeBase).LocalPath), "Plugins");
+            System.Reflection.Assembly a = null;
 
-            var assyName = new System.Reflection.AssemblyName(args.Name);
-
-            var newPath = System.IO.Path.Combine(probingPath, assyName.Name);
-            if (!newPath.EndsWith(".dll"))
-            {
-                newPath = newPath + ".dll";
-            }
-            foreach (System.IO.DirectoryInfo subProbingPath in (new System.IO.DirectoryInfo(probingPath)).GetDirectories())
-            {
-                newPath = System.IO.Path.Combine(subProbingPath.FullName, assyName.Name);
-                if (!newPath.EndsWith(".dll"))
-                {
-                    newPath = newPath + ".dll";
-                    break;
-                }
-            }
-            if (System.IO.File.Exists(newPath))
-            {
-                var assy = System.Reflection.Assembly.LoadFile(newPath);
-                return assy;
-            }
-            return null;
+            //App Folder
+            string exePath = System.IO.Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
+            if (a is null) { a = isAssemblyHere(exePath, args); }
+            //App/Plugins Folder
+            string pluginsPath = System.IO.Path.Combine(exePath, "Plugins");
+            if (a is null) { a = isAssemblyHere(pluginsPath, args); }
+            //App/Plugins/PluginName Folder
+            string pluginPath = System.IO.Path.Combine(pluginsPath, args.Name);
+            if (a is null) { a = isAssemblyHere(pluginPath, args); }
+            //System32 Folder
+            if (a is null) { a = isAssemblyHere(Environment.SystemDirectory, args); }
+            //Windows Folder
+            if (a is null) { a = isAssemblyHere(Environment.GetFolderPath(Environment.SpecialFolder.Windows), args); }
+            if (a is null) { LogManager.GetCurrentClassLogger().Error("{0} could not be found in any of the following locations:\r\n\t{1}\r\n\t{2}\r\n\t{3}\r\n\t{4}\r\n\t{5}\r\n", args.Name, exePath, pluginsPath, pluginPath, Environment.SystemDirectory, Environment.GetFolderPath(Environment.SpecialFolder.Windows)); }
+            return a;
         }
-
+        private static Assembly isAssemblyHere(string directory, ResolveEventArgs args)
+        {
+            string path = Path.Combine(directory, string.Format("{0}.dll", args.Name));
+            try { return File.Exists(path) ? Assembly.LoadFile(path) : null; }
+            catch (Exception ex)
+            {
+                LogManager.GetCurrentClassLogger().Error(ex, string.Format("Failed to load assembly where it was found: {0}", path));
+                return null;
+            }
+        }
     }
 }

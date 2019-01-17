@@ -16,6 +16,9 @@ set-location "$working"
 copy "$source"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
 #Licence File
 copy "..\..\LICENSE"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
+#Plugin Selection List Icons
+copy "Local.ico"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
+copy "Online.ico"  -Destination (New-Item "$workingDir" -Type container -force) -Container -force
 
 
 <#
@@ -72,7 +75,7 @@ Foreach-Object {
     $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
     $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
 
-    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 ""';
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 "" IconIndex 1';
     $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
     $output = 'Updating Plugins.ini: ' + $output
     if ($output -like '*File saved successfully:*') {}

@@ -141,7 +141,6 @@ ReserveFile `Plugins.ini`
 		SetOverwrite on ;Allow Over files
 
 		;Create Service
-		;SimpleSC::InstallService "$(^Name)" "BatMon (System Monitor)" "16" "2" "$INSTDIR\BatMon.exe" "" "" ""
 		nsExec::Exec '"$INSTDIR\BatMon.exe" install'
 		Pop $0
 		IntCmp $0 0 +3
@@ -150,7 +149,7 @@ ReserveFile `Plugins.ini`
 		DetailPrint "BatMon Service Installed"
 
 		SetShellVarContext all
-		CreateShortCut '$desktop\${PRODUCT_NAME} Dashboard.lnk' 'http://localhost:7865' '' "$INSTDIR\BatMon.exe" 2 SW_SHOWMAXIMIZED
+		CreateShortCut '$desktop\${PRODUCT_NAME} Dashboard.lnk' 'http://localhost:7865' '' '$INSTDIR\BatMon.exe' 0 SW_SHOWMAXIMIZED
 		DetailPrint "Desktop shortcut to Dashboard created"
 	SectionEnd
 
@@ -234,9 +233,12 @@ ReserveFile `Plugins.ini`
 		SetRegView 32
 		InitPluginsDir
 		File `/oname=$PLUGINSDIR\Plugins.ini` `Plugins.ini`
+		File `/oname=$PLUGINSDIR\Local.ico` `Local.ico`
+		File `/oname=$PLUGINSDIR\Online.ico` `Online.ico`
 
-		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon1` `$EXEDIR\icon1.ico`
- 		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon2` `$EXEDIR\icon2.ico`
+
+		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon1` `$PLUGINSDIR\Local.ico`
+ 		WriteINIStr `$PLUGINSDIR\Plugins.ini` `Icons` `Icon2` `$PLUGINSDIR\Online.ico`
 
 		############################
 		## /P "Comma,Seperated,List"

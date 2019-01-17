@@ -29,7 +29,13 @@ namespace BatMon
             var host = HostFactory.New(x =>
             {
                 x.UseNLog();
-
+                x.EnableServiceRecovery(r =>
+                {
+                    r.RestartService(0);
+                    r.RestartService(1);
+                    r.RestartService(5);
+                }
+                );
                 x.Service<BatMonService>(s =>
                 {
                     s.ConstructUsing(settings => new BatMonService());
