@@ -135,7 +135,7 @@ namespace BatMon.ScheduledTasks
                                                             , t.Name.Substring(0, Math.Min(39, t.Name.Length))
                                                             , "NeverRun"
                                                             , settings.ResultCodes["NeverRun"].AppDynamicsCode
-                                                            , settings.ResultCodes["NeverRun"].Description
+                                                            , r.Last<Result>().ErrorDescription
                                                             )
                                 );
                             }
@@ -151,7 +151,7 @@ namespace BatMon.ScheduledTasks
                                                                 , t.Name.Substring(0, Math.Min(39, t.Name.Length))
                                                                 , t.LastTaskResult.ToString()
                                                                 , settings.ResultCodes[t.LastTaskResult.ToString()].AppDynamicsCode
-                                                                , settings.ResultCodes[t.LastTaskResult.ToString()].Description
+                                                                , r.Last<Result>().ErrorDescription
                                                                 )
                                     );
                                 }
@@ -163,7 +163,7 @@ namespace BatMon.ScheduledTasks
                                                                 , t.Name.Substring(0, Math.Min(39, t.Name.Length))
                                                                 , t.LastTaskResult.ToString()
                                                                 , settings.ResultCodes[t.LastTaskResult.ToString()].AppDynamicsCode
-                                                                , settings.ResultCodes[t.LastTaskResult.ToString()].Description
+                                                                , r.Last<Result>().ErrorDescription
                                                                 )
                                     );
                                 }
@@ -179,7 +179,7 @@ namespace BatMon.ScheduledTasks
                                                             , t.Name.Substring(0, Math.Min(39, t.Name.Length))
                                                             , "Disabled"
                                                             , settings.ResultCodes["Disabled"].AppDynamicsCode
-                                                            , settings.ResultCodes["Disabled"].Description
+                                                            , r.Last<Result>().ErrorDescription
                                                             )
                                 );
                         }
