@@ -31,8 +31,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c" />
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -42,6 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Config\FolderCollection.cs" />
+    <Compile Include="Config\FolderElement.cs" />
+    <Compile Include="Config\WindowsShareSection.cs" />
     <Compile Include="WindowsSharePlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -59,6 +64,10 @@ mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins"
 mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
 xcopy "$(ProjectDir)bin\$(ConfigurationName)" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)" /E /R /Y
 
+REM Copy Config file
+copy "$(SolutionDir)Installer Package\Default Config\BatMon.WindowsShare.dll.config" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)\BatMon.WindowsShare.dll.config" /Y
+
+REM Build Installer
 powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
 </PostBuildEvent>
   </PropertyGroup>

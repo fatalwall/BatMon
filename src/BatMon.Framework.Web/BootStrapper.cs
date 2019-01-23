@@ -1,4 +1,4 @@
-﻿/* 
+﻿ /* 
  *Copyright (C) 2018 Peter Varney - All Rights Reserved
  * You may use, distribute and modify this code under the
  * terms of the MIT license, 
@@ -30,6 +30,10 @@ namespace BatMon.Framework.Web
 
             nancyConventions.StaticContentsConventions.Add
             (StaticContentConventionBuilder.AddDirectory("fonts", "/web/fonts"));
+
+            nancyConventions.StaticContentsConventions.Add
+            (StaticContentConventionBuilder.AddDirectory("Static", @"Static"));
+
         }
     }
 }

@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default Config", "Default C
 	ProjectSection(SolutionItems) = preProject
 		Installer Package\Default Config\BatMon.exe.config = Installer Package\Default Config\BatMon.exe.config
 		Installer Package\Default Config\BatMon.ScheduledTasks.dll.config = Installer Package\Default Config\BatMon.ScheduledTasks.dll.config
+		Installer Package\Default Config\BatMon.WindowsShare.dll.config = Installer Package\Default Config\BatMon.WindowsShare.dll.config
 	EndProjectSection
 EndProject
 Global
