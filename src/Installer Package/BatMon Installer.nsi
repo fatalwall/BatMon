@@ -121,7 +121,7 @@ ReserveFile `Plugins.ini`
 
 	Section "BatMon Core Files (Required)" core
 		SectionIn RO
-		SetRegView 32
+		;SetRegView 32
 		SetOutPath "$INSTDIR"
 		;Remove Service if it exists
 		SimpleSC::ExistsService "$(^Name)"
@@ -155,10 +155,12 @@ ReserveFile `Plugins.ini`
 
 	Section "Plugins" plgn
 		SectionIn RO
-		SetRegView 32
+		;SetRegView 32
 		SetOutPath "$PLUGINSDIR"
 		;This function loops through all plugin list items and installs, uninstalls, or skips based on whats needed
-		File /r "Plugins\*"
+		File /r "Plugins\Required\*"
+		File /r "Plugins\Default\*"
+		File /r "Plugins\Optional\*"
 		StrCpy $PluginCounter 0
 		${Do}
 			IntOp $PluginCounter $PluginCounter + 1 ;Increment Conter
@@ -177,7 +179,7 @@ ReserveFile `Plugins.ini`
 
 			${If} $PluginChecked = 1
 				;Run Plugin Installer
-				nsExec::Exec `"$PLUGINSDIR\$PluginName.exe" /S /D=$INSTDIR\Plugins` 
+				nsExec::Exec `"$PLUGINSDIR\$PluginName.exe" /S /D=$INSTDIR\Plugins`
 				Pop $0
 				${If} $0 = 0
 					DetailPrint "$PluginName Successfully Installed"
@@ -205,7 +207,7 @@ ReserveFile `Plugins.ini`
 		${ifNot} "$EXEPATH" == "$INSTDIR\inst.exe"
 			CopyFiles "$EXEPATH" "$INSTDIR\inst.exe"
 		${EndIf}
-		SetRegView 32
+		;SetRegView 32
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "ModifyPath" "$INSTDIR\inst.exe"
@@ -230,7 +232,7 @@ ReserveFile `Plugins.ini`
 	SectionEnd
 
 	Function .onInit
-		SetRegView 32
+		;SetRegView 32
 		InitPluginsDir
 		File `/oname=$PLUGINSDIR\Plugins.ini` `Plugins.ini`
 		File `/oname=$PLUGINSDIR\Local.ico` `Local.ico`

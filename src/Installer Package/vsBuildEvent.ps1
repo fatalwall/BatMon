@@ -147,7 +147,7 @@ Foreach-Object {
     $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
     $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
 
-    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" IconIndex 1 Checked 0 SubItem3 ""';
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 "" IconIndex 1 Checked 0';
     $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
     $output = 'Updating Plugins.ini: ' + $output
     if ($output -like '*File saved successfully:*') {}

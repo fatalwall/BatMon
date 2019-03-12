@@ -10,7 +10,7 @@
 ;Required modules
 !include "MUI.nsh"
 !include "LogicLib.nsh"
-!include "x64.nsh"
+;!include "x64.nsh"
 
 
 
@@ -81,13 +81,13 @@ ShowUnInstDetails show
 		WriteUninstaller "$INSTDIR\uninst.exe"
 		nsExec::Exec 'EVENTCREATE /L APPLICATION /SO "BatMon" /T INFORMATION /ID 1000  /D "Plugin $(^Name) ${PRODUCT_VERSION} Installed Successfully"'
 
-		SetRegView 32
+		;SetRegView 32
         WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Version" "&{Plugin.AssemblyVersion}"
 		WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
 	SectionEnd
 
 	Function .onInit
-		SetRegView 32
+		;SetRegView 32
 		StrCpy $INSTDIR "$INSTDIR\&{Plugin.AssemblyName}"
 	FunctionEnd
 ############################

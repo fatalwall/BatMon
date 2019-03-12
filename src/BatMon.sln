@@ -23,6 +23,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.AllPlugins", "BatMon.AllPlugins\BatMon.AllPlugins.csproj", "{C5BD6183-ACA8-4341-B603-1518664EA06E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Installer Package", "{0DB0153C-562B-4071-BBAE-9DFDE0D411C6}"
+	ProjectSection(SolutionItems) = preProject
+		Installer Package\BatMon Installer.nsi = Installer Package\BatMon Installer.nsi
+		Installer Package\GetAssemblyValue.exe = Installer Package\GetAssemblyValue.exe
+		Installer Package\INILib.dll = Installer Package\INILib.dll
+		Installer Package\Local.ico = Installer Package\Local.ico
+		Installer Package\NSISEmbeddedListBuilder.exe = Installer Package\NSISEmbeddedListBuilder.exe
+		Installer Package\Online.ico = Installer Package\Online.ico
+		Installer Package\Plugin Installer.nsi = Installer Package\Plugin Installer.nsi
+		Installer Package\Plugins.ini = Installer Package\Plugins.ini
+		Installer Package\vsBuildEvent.ps1 = Installer Package\vsBuildEvent.ps1
+		Installer Package\vsBuildEvent_Plugins.ps1 = Installer Package\vsBuildEvent_Plugins.ps1
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Default Config", "Default Config", "{39B39A86-FCBB-4CE9-B25B-0DF970689906}"
 	ProjectSection(SolutionItems) = preProject
