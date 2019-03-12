@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("BatMan.WindowsShare")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("BatMon plugin for Windows Shares")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Peter Varney")]
 [assembly: AssemblyProduct("WindowsShare")]

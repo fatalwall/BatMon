@@ -42,6 +42,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="vshed.IO.UncShare, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\vshed.IO.UncShare.1.0.1\lib\net47\vshed.IO.UncShare.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config\FolderCollection.cs" />
@@ -55,6 +58,9 @@
       <Project>{1ac1cb3a-98d0-499b-8aef-7043c78a4dc6}</Project>
       <Name>BatMon.Framework</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

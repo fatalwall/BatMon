@@ -4,6 +4,8 @@ namespace BatMon.WindowsShare.Config
 {
     public class FolderElement : ConfigurationElement
     {
+        public override string ToString()
+        { return string.Format("{0} ({1})", this.ProcessName, this.Path); }
 
         [ConfigurationProperty("ApplicationName", IsKey = false, IsRequired = true)]
         public string ApplicationName
@@ -26,7 +28,7 @@ namespace BatMon.WindowsShare.Config
             set { this["ProcessName"] = value; }
         }
 
-        [ConfigurationProperty("Path", IsKey = true, IsRequired = true)]
+        [ConfigurationProperty("Path", IsKey = false, IsRequired = true)]
         public string Path
         {
             get { return (string)base["Path"]; }
@@ -45,6 +47,13 @@ namespace BatMon.WindowsShare.Config
         {
             get { return string.IsNullOrWhiteSpace((string)base["Password"]) ? null : (string)base["Password"]; }
             set { this["Password"] = value; }
+        }
+
+        [ConfigurationProperty("ContentCheck", IsKey = false, IsRequired = false, DefaultValue = true)]
+        public bool ContentCheck
+        {
+            get { return (bool)base["ContentCheck"]; }
+            set { this["ContentCheck"] = value; }
         }
     }
 }

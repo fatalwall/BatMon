@@ -16,10 +16,10 @@ namespace BatMon.WindowsShare.Config
 
         protected override ConfigurationElement CreateNewElement() { return new FolderElement(); }
 
-        protected override object GetElementKey(ConfigurationElement element) { return ((FolderElement)element).Path; }
+        protected override object GetElementKey(ConfigurationElement element) { return ((FolderElement)element); }
 
         public void Add(FolderElement e) { BaseAdd(e); }
-        public void Remove(FolderElement e) { if (BaseIndexOf(e) >= 0) BaseRemove(e.Path); }
+        public void Remove(FolderElement e) { if (BaseIndexOf(e) >= 0) BaseRemove(e); }
         public void RemoveAt(int index) { BaseRemoveAt(index); }
 
         public void Clear() { BaseClear(); }

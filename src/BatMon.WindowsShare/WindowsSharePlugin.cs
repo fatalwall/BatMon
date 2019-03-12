@@ -13,6 +13,7 @@ using BatMon.WindowsShare.Config;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Net;
+using vshed.IO;
 
 namespace BatMon.WindowsShare
 {
@@ -28,28 +29,34 @@ namespace BatMon.WindowsShare
             foreach (FolderElement f in settings.Folders)
             {
                 logger.Trace(string.Format("Path: {0} User: {1}", f.Path, f.User??""));
-                Match remoteHost = new Regex(@"(?<=^\\\\)[^\\]*?(?=\\|$)").Match(f.Path);
-                CredentialCache loginCache = new CredentialCache();
-                //Create credentials if needed
-                if (f.User != null)
+
+                UncShare Credentials = null;
+                try
                 {
-                    NetworkCredential login = new NetworkCredential(f.User, f.Password);
-                    loginCache.Add(new System.Uri(string.Format(@"\\{0}", remoteHost)), "Negotiate", login);
+                    //Initialize Credentials if needed
+                    if (f.User != null)
+                        Credentials = new UncShare(f.Path, f.User, f.Password);
+
+                    //Run Filesystem Test
+                    if (!System.IO.Directory.Exists(f.Path)) { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Failure", string.Format("Path could not be found {0}", f.Path))); }
+                    else
+                    {
+
+                        if (f.ContentCheck & System.IO.Directory.GetFiles(f.Path).Length <= 0 & System.IO.Directory.GetDirectories(f.Path).Length <= 0) { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Error", string.Format("Path contains 0 files and directories {0}", f.Path))); }
+                        else { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Successful", "Folder or Network share is acessable")); }
+                    }
+                }
+                catch (System.ComponentModel.Win32Exception ex)
+                {
+                    r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Failure", ex.Message));
+                }
+                finally
+                {
+                    //Clean up credentials if needed
+                    if (Credentials != null)
+                        Credentials.Dispose();
                 }
 
-                //Run Filesystem Test
-                if (!System.IO.Directory.Exists(f.Path)) { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Error", string.Format("Path could not be found ", f.Path))); }
-                else
-                {
-                    if (System.IO.Directory.GetFiles(f.Path).Length <= 0) { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Error", string.Format("Path contains 0 files ", f.Path))); }
-                    else { r.Add(new Result(f.ApplicationName, f.TierName, f.ProcessName, "Successful", string.Format("Path could not be found ", f.Path))); }
-                }
-
-                
-
-                //Clean up credentials created
-                if (f.User != null) { loginCache.Remove(new System.Uri(string.Format(@"\\{0}", remoteHost)), "Negotiate"); }
-                loginCache = null;
             }
             return r.ToArray();
         }
