@@ -30,6 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c" />
     <Reference Include="System" />
@@ -64,17 +67,19 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM Plugin FIles for debuging
+    <PostBuildEvent>REM Plugin Files for debuging
 rmdir /s /q "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
 mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins"
 mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
 xcopy "$(ProjectDir)bin\$(ConfigurationName)" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)" /E /R /Y
-
 REM Copy Config file
 copy "$(SolutionDir)Installer Package\Default Config\BatMon.WindowsShare.dll.config" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)\BatMon.WindowsShare.dll.config" /Y
 
 REM Build Installer
-powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
-</PostBuildEvent>
+powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "Optional" "$(SolutionDir)\"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
 </Project>

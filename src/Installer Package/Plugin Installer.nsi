@@ -42,7 +42,7 @@
 
 ;Settings
 Name "${PRODUCT_NAME}"
-OutFile "Plugins\${PRODUCT_NAME}.exe"
+OutFile "Plugins\&{Plugin.Type}\${PRODUCT_NAME}.exe"
 RequestExecutionLevel admin
 InstallDir "$PROGRAMFILES\BatMon\Plugins"
 ShowInstDetails show

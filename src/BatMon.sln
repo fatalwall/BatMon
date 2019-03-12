@@ -4,16 +4,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.ScheduledTasks", "BatMon.ScheduledTasks\BatMon.ScheduledTasks.csproj", "{D8E6785B-AB3F-47CD-A7B0-80BC0D3FBDDA}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DCAD985A-F79F-430E-85E8-456013AEDB53} = {DCAD985A-F79F-430E-85E8-456013AEDB53}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework", "BatMon.Framework\BatMon.Framework.csproj", "{1AC1CB3A-98D0-499B-8AEF-7043C78A4DC6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.WindowsShare", "BatMon.WindowsShare\BatMon.WindowsShare.csproj", "{948121BA-9E79-4B6C-B215-67FABD36BB84}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DCAD985A-F79F-430E-85E8-456013AEDB53} = {DCAD985A-F79F-430E-85E8-456013AEDB53}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.TestHarness", "BatMon.Framework.TestHarness\BatMon.Framework.TestHarness.csproj", "{515DE1B6-92E0-4BA0-BE60-F874474F8C12}"
 EndProject
@@ -27,9 +21,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.Framework.Web", "BatMon.Framework.Web\BatMon.Framework.Web.csproj", "{DCAD985A-F79F-430E-85E8-456013AEDB53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BatMon.AllPlugins", "BatMon.AllPlugins\BatMon.AllPlugins.csproj", "{C5BD6183-ACA8-4341-B603-1518664EA06E}"
-	ProjectSection(ProjectDependencies) = postProject
-		{DCAD985A-F79F-430E-85E8-456013AEDB53} = {DCAD985A-F79F-430E-85E8-456013AEDB53}
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Package", "Installer Package", "{0DB0153C-562B-4071-BBAE-9DFDE0D411C6}"
 EndProject

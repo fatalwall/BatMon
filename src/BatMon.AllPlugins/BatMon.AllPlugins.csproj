@@ -60,7 +60,7 @@ mkdir  "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)"
 xcopy "$(ProjectDir)bin\$(ConfigurationName)" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)" /E /R /Y
 
 REM Installer Build Process
-powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
+powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "Required" "$(SolutionDir)\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

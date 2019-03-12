@@ -86,6 +86,78 @@ Foreach-Object {
     Write-Output "Version: $Version"
 }
 
+Get-ChildItem "$workingDir\Plugins" -Filter *.exe | 
+Foreach-Object {
+    $args = '"' + $_.FullName + '"'
+    $Product = cmd /c "GetAssemblyValue.exe $args Product" 2`>`&1
+    $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
+    $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
+
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 "" IconIndex 1';
+    $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
+    $output = 'Updating Plugins.ini: ' + $output
+    if ($output -like '*File saved successfully:*') {}
+    else { $ErrorCode += -2 }
+    Write-Output $output
+    Write-Output "Product: $Product"
+    Write-Output "Company: $Company"
+    Write-Output "Version: $Version"
+}
+
+Get-ChildItem "$workingDir\Plugins\Required" -Filter *.exe | 
+Foreach-Object {
+    $args = '"' + $_.FullName + '"'
+    $Product = cmd /c "GetAssemblyValue.exe $args Product" 2`>`&1
+    $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
+    $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
+
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 "" IconIndex 1 Checked 1 DisableCheck 1';
+    $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
+    $output = 'Updating Plugins.ini: ' + $output
+    if ($output -like '*File saved successfully:*') {}
+    else { $ErrorCode += -2 }
+    Write-Output $output
+    Write-Output "Product: $Product"
+    Write-Output "Company: $Company"
+    Write-Output "Version: $Version"
+}
+
+Get-ChildItem "$workingDir\Plugins\Default" -Filter *.exe | 
+Foreach-Object {
+    $args = '"' + $_.FullName + '"'
+    $Product = cmd /c "GetAssemblyValue.exe $args Product" 2`>`&1
+    $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
+    $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
+
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" SubItem3 "" IconIndex 1 Checked 1';
+    $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
+    $output = 'Updating Plugins.ini: ' + $output
+    if ($output -like '*File saved successfully:*') {}
+    else { $ErrorCode += -2 }
+    Write-Output $output
+    Write-Output "Product: $Product"
+    Write-Output "Company: $Company"
+    Write-Output "Version: $Version"
+}
+
+Get-ChildItem "$workingDir\Plugins\Optional" -Filter *.exe | 
+Foreach-Object {
+    $args = '"' + $_.FullName + '"'
+    $Product = cmd /c "GetAssemblyValue.exe $args Product" 2`>`&1
+    $Company = cmd /c "GetAssemblyValue.exe $args Company" 2`>`&1
+    $Version = cmd /c "GetAssemblyValue.exe $args Version" 2`>`&1
+
+    $args = '"' + $SolutionDir + 'Installer Package\bin\' + $ConfigurationName + '\Plugins.ini"' + ' "' + $Product + '" SubItem1 "' + $Company + '" SubItem2 "' + $Version + '" IconIndex 1 Checked 0 SubItem3 ""';
+    $output = cmd /c "NSISEmbeddedListBuilder.exe $args" 2`>`&1
+    $output = 'Updating Plugins.ini: ' + $output
+    if ($output -like '*File saved successfully:*') {}
+    else { $ErrorCode += -2 }
+    Write-Output $output
+    Write-Output "Product: $Product"
+    Write-Output "Company: $Company"
+    Write-Output "Version: $Version"
+}
+
 
 <#
 #	Compile NSIS Script

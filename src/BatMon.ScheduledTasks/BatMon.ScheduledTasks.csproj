@@ -88,7 +88,7 @@ REM Copy Config file
 copy "$(SolutionDir)Installer Package\Default Config\BatMon.ScheduledTasks.dll.config" "$(SolutionDir)BatMon\$(OutDir)Plugins\$(ProjectName)\BatMon.ScheduledTasks.dll.config" /Y
 
 REM Build Installer
-powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "$(SolutionDir)\"
+powershell -ExecutionPolicy Unrestricted -File "$(SolutionDir)Installer Package\vsBuildEvent_Plugins.ps1" "$(ProjectName)" "$(ConfigurationName)" "Default" "$(SolutionDir)\"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

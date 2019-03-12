@@ -129,7 +129,7 @@ namespace BatMon.Framework.Web
                 int MemPercent = (int)(((double)(TotalMem - AvailMem) / TotalMem) * 100);
                 t = t + string.Format(@"<tr class='{0}'>", MemPercent >= 95 ? "Critical" : MemPercent >= 85 ? "Warning" : "Good");
                 t = t + string.Format(@"<td>{0}</td>", Environment.ProcessorCount);
-                t = t + string.Format(@"<td>{0} GB</td>", TotalMem / 1024 / 1024 / 1024);
+                t = t + string.Format(@"<td>{0:0.#} GB</td>", (decimal)TotalMem / 1024 / 1024 / 1024);
                 t = t + string.Format(@"<td>{0}%</td>", MemPercent);
                 t = t + @"</tr>";
                 t = t + @"</tbody>";

@@ -1,7 +1,8 @@
 param (
     [string]$ProjectName,
     [string]$ConfigurationName,
-    [string]$SolutionDir
+    [string]$PluginType,
+    [string]$SolutionDir  
 )
 $sourceDir = $SolutionDir + 'Installer Package\'
 $sourceFileName = 'Plugin Installer.nsi'
@@ -63,7 +64,8 @@ $Description = cmd /c "GetAssemblyValue.exe $args" 2`>`&1
 # Build (Release or Debug)
 (gc "$workingFile") -replace '&{Plugin.BuildType}', "$ConfigurationName" | Out-File "$workingFile"
 
-
+# PluginType - Required Default Optional
+(gc "$workingFile") -replace '&{Plugin.Type}', "$PluginType" | Out-File "$workingFile"
 
 <#
 #	Compile NSIS Script
@@ -75,3 +77,5 @@ else { $ErrorCode += -1 }
 Write-Output $output
 
 exit $ErrorCode
+
+
