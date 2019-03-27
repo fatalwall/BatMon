@@ -78,6 +78,7 @@
     <Compile Include="Config\BatMonSection.cs" />
     <Compile Include="Config\EmailCollection.cs" />
     <Compile Include="Config\EmailElement.cs" />
+    <Compile Include="Diagnostics.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="IBatMonPlugin.cs" />
     <Compile Include="BatMonPluginManager.cs" />

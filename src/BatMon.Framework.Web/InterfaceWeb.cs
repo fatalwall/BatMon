@@ -17,6 +17,7 @@ using System.Net;
 using Newtonsoft.Json;
 using System.IO;
 using Microsoft.VisualBasic.Devices;
+using System.Reflection;
 
 
 namespace BatMon.Framework.Web
@@ -114,8 +115,8 @@ namespace BatMon.Framework.Web
                 t = t + string.Format(@"<div class='content'><b>{0}:</b> {1}</div>", "OS", new ComputerInfo().OSFullName);
                 t = t + string.Format(@"<div class='content'><b>{0}:</b> {1}</div>", "OS Platform", new ComputerInfo().OSPlatform);
                 t = t + string.Format(@"<div class='content'><b>{0}:</b> {1}</div>", "OS Version", new ComputerInfo().OSVersion);
-                t = t + string.Format(@"<div class='content'><b>{0}:</b> {1}</div>", "BatMon Version", this.GetType().Assembly.GetName().Version.ToString());
-
+                t = t + string.Format(@"<div class='content'><b>{0}:</b> {1}</div>", "BatMon Version", Assembly.GetEntryAssembly().GetName().Version.ToString(BatMon.Framework.Diagnostics.isRelease() ? 3 : 4));
+                
                 t = t + @"<div class='content'>";
                 t = t + @"<table class='System'>";
                 t = t + @"<thead>";
