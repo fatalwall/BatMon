@@ -24,10 +24,12 @@ namespace BatMon.Framework.Web
     public class InterfaceWeb : NancyModule
     {
 
-        public static Uri[] GetUriBindings(int Port)
+        public Uri[] GetUriBindings(int Port)
         {
             List<Uri> uriResults = new List<Uri>();
-            uriResults.Add(new Uri(string.Format("http://{0}:{1}", "localhost", Port)));
+            
+            if (this.Request.UserHostAddress == "127.0.0.1" || this.Request.UserHostAddress == "::1")
+                uriResults.Add(new Uri(string.Format("http://{0}:{1}", "localhost", Port)));
             uriResults.Add(new Uri(string.Format("http://{0}:{1}", Dns.GetHostName(), Port)));
             if (Dns.GetHostEntry("").HostName != Dns.GetHostName())
                 uriResults.Add(new Uri(string.Format("http://{0}:{1}", Dns.GetHostEntry("").HostName, Port)));
